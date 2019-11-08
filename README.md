@@ -2,6 +2,24 @@
 
 Clean version under work for robust Low-Rank statistical learning.
 
+## Quick start (linux/macOS)
+
+### Installation
+
+```
+git clone https://github.com/antoinecollas/Low-Rank-Statistical-testing
+cd Low-Rank-Statistical-testing
+conda create -n change_detection python=3.7 --yes
+conda activate change_detection
+pip install -r requirements.txt
+```
+
+### Run code
+
+```
+python compute_ROC_UAVSAR_dataset.py
+```
+
 ## Files' organisation
 
 
