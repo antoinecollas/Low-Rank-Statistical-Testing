@@ -57,6 +57,8 @@ def download_uavsar_cd_dataset(path='./Data/'):
 
     for file_url in list_of_files:
         if not os.path.exists(path + file_url.split('/')[-1]):
+            if not os.path.exists(path):
+                os.makedirs(path)
             import wget
             print("File %s not found, downloading it" % file_url.split('/')[-1])
             wget.download(url=file_url, out=path+file_url.split('/')[-1])
