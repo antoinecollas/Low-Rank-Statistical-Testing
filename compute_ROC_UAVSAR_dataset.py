@@ -147,27 +147,27 @@ if __name__ == '__main__':
 
     # Gaussian
     # statistic_list = [covariance_equality_glrt_gaussian_statistic]
-    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{Eq}}$']
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$']
     # args_list = ['log']
 
     # Low rank Gaussian
     # statistic_list = [LR_CM_equality_test]
-    # statistic_names = [r'$\hat{Lambda}_{\mathrm{lrEq}}$']
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{LRG}}$']
     # args_list = [(3, None, 'log')]
 
     # Compound Gaussian
     # statistic_list = [scale_and_shape_equality_robust_statistic]
-    # statistic_names = [r'$\hat{Lambda}_{\mathrm{lrEq}}$']
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{CG}}$']
     # args_list = [(0.01, 20, 'log')]
 
     # Low rank Compound Gaussian
-    statistic_list = [scale_and_shape_equality_robust_statistic_low_rank]
-    statistic_names = [r'$\hat{\Lambda}_{\mathcal{R},\mathrm{LR}}$']
-    args_list = [(0.01, 20, 3, None, 'log')]
+    # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank]
+    # statistic_names = [r'$\hat{=\Lambda}_{\mathrm{LRCG}}$']
+    # args_list = [(0.01, 20, 3, None, 'log')]
 
-    # statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, proportionality_statistic_marginal, Riemaniann_distance_matrix_textures]
-    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{Eq}}$', r'$\hat{Lambda}_{\mathrm{lrEq}}$', r'$\hat{Lambda}_{\mathrm{P}}$', r'$\hat{Lambda}_{\mathrm{Rie}}$']
-    # args_list = ['log', (1, 0, 'log'), (20, 0.01, 'log'), (1, 0, 0.01, 20, 'log')]
+    statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
+    statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{LRG}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
+    args_list = ['log', (3, None, 'log'), (0.01, 20, 'log'), (0.01, 20, 3, None, 'log')]
     
     number_of_statistics = len(statistic_list)
     function_args = [statistic_list, args_list]
