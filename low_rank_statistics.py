@@ -105,7 +105,7 @@ def σ2_estimaton(𝐗, R):
     𝚺 = SCM(𝐗)
     u, s, vh = np.linalg.svd(𝚺)
     if R<p:
-        σ2 = s[R+1:].mean()
+        σ2 = s[R:].mean()
     else:
         σ2 = 0
     return σ2
@@ -269,7 +269,7 @@ def tyler_estimator_covariance_matandtext_low_rank(𝐗, R, σ2, tol, iter_max):
     # Recursive algorithm
     while (δ>tol) and iteration < iter_max:
 
-        # Compute the textures for each pixel using all the dates avalaibe
+        # Compute the textures for each pixel using all the dates available
         τ = 0
         i𝚺 = np.linalg.inv(𝚺)
         for t in range(0, T):
