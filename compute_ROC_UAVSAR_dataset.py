@@ -71,7 +71,7 @@ if __name__ == '__main__':
     DEBUG = False
 
     # Activate latex in figures (or not)
-    latex_in_figures = False
+    latex_in_figures = True
     if latex_in_figures:
       enable_latex_infigures()
 
