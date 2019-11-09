@@ -207,3 +207,153 @@ def LR_Plug_in_CM_equality_test(𝐗, args):
 # ----------------------------------------------------------------------------
 # 2) Low-Rank SIRV CM equality statistic
 # ----------------------------------------------------------------------------
+
+def tyler_estimator_covariance_low_rank(𝐗, R, σ2, tol=0.001, iter_max=20):
+    """ A function that computes the Tyler Fixed Point Estimator for covariance matrix estimation
+        Inputs:
+            * 𝐗 = a matrix of size p*N with each observation along column dimension
+            * tol = tolerance for convergence of estimator
+            * R = Rank
+            * σ2 = noise level
+            * iter_max = number of maximum iterations
+        Outputs:
+            * 𝚺 = the estimate
+            * δ = the final distance between two iterations
+            * iteration = number of iterations til convergence """
+
+    # Initialisation
+    (p,N) = 𝐗.shape
+    δ = np.inf # Distance between two iterations
+    𝚺 = SCM(𝐗) # Initialise estimate to identity
+    iteration = 0
+
+    # Recursive algorithm
+    while (δ>tol) and (iteration<iter_max):
+        
+        # Computing expression of Tyler estimator (with matrix multiplication)
+        τ = np.diagonal(𝐗.conj().T@np.linalg.inv(𝚺)@𝐗)
+        𝐗_bis = 𝐗 / np.sqrt(τ)
+        𝚺_new = (p/N) * 𝐗_bis@𝐗_bis.conj().T
+
+        # Imposing low rank structure
+        𝚺_new = LR_𝜮(𝚺_new, R, σ2)
+
+        # Condition for stopping
+        δ = np.linalg.norm(𝚺_new - 𝚺, 'fro') / np.linalg.norm(𝚺, 'fro')
+        iteration = iteration + 1
+
+        # Updating 𝚺
+        𝚺 = 𝚺_new
+
+    return (𝚺, δ, iteration)
+
+def tyler_estimator_covariance_matandtext_low_rank(𝐗, R, σ2, tol, iter_max):
+    """ A function that computes the Modified Tyler Fixed Point Estimator Low Rank for 
+    covariance matrix estimation under problem MatAndText.
+        Inputs:
+            * 𝐗 = a matrix of size p*N*T with each saptial observation along column dimension and time
+                observation along third dimension.
+            * R = Rank
+            * σ2 = noise lvel
+            * tol = tolerance for convergence of estimator
+            * iter_max = number of maximum iterations
+        Outputs:
+            * 𝚺 = the estimate
+            * δ = the final distance between two iterations
+            * iteration = number of iterations til convergence """
+    (p, N, T) = 𝐗.shape
+    δ = np.inf # Distance between two iterations
+    𝚺 = SCM(𝐗.reshape((p,T*N))) # Initialise estimate to SCM
+    iteration = 0
+
+    # Recursive algorithm
+    while (δ>tol) and iteration < iter_max:
+
+        # Compute the textures for each pixel using all the dates avalaibe
+        τ = 0
+        i𝚺 = np.linalg.inv(𝚺)
+        for t in range(0, T):
+            τ = τ + np.diagonal(𝐗[:,:,t].conj().T@i𝚺@𝐗[:,:,t])
+
+        # Computing expression of the estimator
+        𝚺_new = 0
+        for t in range(0, T):
+            𝐗_bis = 𝐗[:,:,t] / np.sqrt(τ)
+            𝚺_new = 𝚺_new + (p/N) * 𝐗_bis@𝐗_bis.conj().T
+
+        # Imposing low rank structure
+        𝚺_new = LR_𝜮(𝚺_new, R, σ2)
+
+        # Condition for stopping
+        δ = np.linalg.norm(𝚺_new - 𝚺, 'fro') / np.linalg.norm(𝚺, 'fro')
+
+        # Updating 𝚺
+        𝚺 = 𝚺_new
+        iteration = iteration + 1
+
+
+    return (𝚺, δ, iteration)
+
+def scale_and_shape_equality_robust_statistic_low_rank(𝐗, args):
+    """ Low-Rank GLRT test for testing a change in the scale or/and shape of 
+        a deterministic SIRV model.
+        Inputs:
+            * 𝐗 = a (p, N, T) numpy array with:
+                * p = dimension of vectors
+                * N = number of Samples at each date
+                * T = length of time series
+            * args = (tol, iter_max, R, σ2, scale)
+                * tol = tol for tyler estimation
+                * iter_max = maximum number of iterations for tyler estimation
+                * R = rank (put 0 for adaptive estimation)
+                * σ2 = noise level (put 0 for adaptive estimation)
+                * scale = 'linear' or 'log'
+        Outputs:
+            * the statistic given the observations in input"""
+
+
+    tol, iter_max, R, σ2, scale = args
+    (p, N, T) = 𝐗.shape
+
+    # Estimate R and σ2 if needed
+    if not R:
+        R = Rank_estimation(𝐗.reshape((p, N*T)))
+    if not σ2:
+        σ2 = σ2_estimaton(𝐗.reshape((p,N*T)), R)
+
+    # Estimating 𝚺_0 using all the observations
+    (𝚺_0, δ, niter) = tyler_estimator_covariance_matandtext_low_rank(𝐗, R, σ2, tol, iter_max)
+    i𝚺_0 = np.linalg.inv(𝚺_0)
+
+    # Some initialisation
+    log_numerator_determinant_terms = T*N*np.log(np.abs(np.linalg.det(𝚺_0)))
+    log_denominator_determinant_terms = 0
+    𝛕_0 = 0
+    log𝛕_t = 0
+
+    # Iterating on each date to compute the needed terms
+    for t in range(0,T):
+        # Estimating 𝚺_t
+        (𝚺_t, δ, iteration) = tyler_estimator_covariance_low_rank(𝐗[:,:,t], R, σ2, tol, iter_max)
+
+        # Computing determinant add adding it to log_denominator_determinant_terms
+        log_denominator_determinant_terms = log_denominator_determinant_terms + \
+                                            N*np.log(np.abs(np.linalg.det(𝚺_t)))
+
+        # Computing texture estimation
+        𝛕_0 =  𝛕_0 + np.diagonal(𝐗[:,:,t].conj().T@i𝚺_0@𝐗[:,:,t]) / T
+        log𝛕_t = log𝛕_t + np.log(np.diagonal(𝐗[:,:,t].conj().T@np.linalg.inv(𝚺_t)@𝐗[:,:,t]))
+
+    # Computing quadratic terms
+    log_numerator_quadtratic_terms = T*p*np.sum(np.log(𝛕_0))
+    log_denominator_quadtratic_terms = p*np.sum(log𝛕_t)
+
+    # Final expression of the statistic
+    if scale=='linear':
+        λ = np.exp(np.real(log_numerator_determinant_terms - log_denominator_determinant_terms + \
+        log_numerator_quadtratic_terms - log_denominator_quadtratic_terms))
+    else:
+        λ = np.real(log_numerator_determinant_terms - log_denominator_determinant_terms + \
+        log_numerator_quadtratic_terms - log_denominator_quadtratic_terms)
+
+    return λ

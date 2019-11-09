@@ -67,6 +67,9 @@ def download_uavsar_cd_dataset(path='./Data/'):
 
 if __name__ == '__main__':
 
+    # DEBUG mode for fast debugging
+    DEBUG = False
+
     # Activate latex in figures (or not)
     latex_in_figures = False
     if latex_in_figures:
@@ -95,9 +98,12 @@ if __name__ == '__main__':
     print( ' / 　 づ')
     data_class = uavsar_slc_stack_1x1(PATH)
     data_class.read_data(polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=[28891,31251,2891,3491])
+    if DEBUG:
+        n_r, n_rc, _, _ = data_class.data.shape
+        new_size_image = 200
+        data_class.data = data_class.data[(n_r//2)-(new_size_image//2):(n_r//2)+(new_size_image//2), (n_rc//2)-(new_size_image//2):(n_rc//2)+(new_size_image//2), :, :]
     print('Done')
 
-    # POUR PLUS TARD !
     # Spatial vectors
     center_frequency = 1.26e+9 # GHz, for L Band
     bandwith = float(data_class.meta_data['SanAnd_26524_09014_007_090423_L090HH_03_BC']['Bandwidth']) * 10**6 # Hz
@@ -135,15 +141,34 @@ if __name__ == '__main__':
 
     # Parameters
     n_r, n_rc, p, T = image.shape
-    print('p=', p)
     windows_mask = np.ones((5,5))
     m_r, m_c = windows_mask.shape
     function_to_compute = compute_several_statistics
-    statistic_list = [covariance_equality_glrt_gaussian_statistic]
-    statistic_names = [r'$\hat{\Lambda}_{\mathrm{Eq}}$']
+
+    # Gaussian
+    # statistic_list = [covariance_equality_glrt_gaussian_statistic]
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{Eq}}$']
+    # args_list = ['log']
+
+    # Low rank Gaussian
+    # statistic_list = [LR_CM_equality_test]
+    # statistic_names = [r'$\hat{Lambda}_{\mathrm{lrEq}}$']
+    # args_list = [(3, None, 'log')]
+
+    # Compound Gaussian
+    # statistic_list = [scale_and_shape_equality_robust_statistic]
+    # statistic_names = [r'$\hat{Lambda}_{\mathrm{lrEq}}$']
+    # args_list = [(0.01, 20, 'log')]
+
+    # Low rank Compound Gaussian
+    statistic_list = [scale_and_shape_equality_robust_statistic_low_rank]
+    statistic_names = [r'$\hat{\Lambda}_{\mathcal{R},\mathrm{LR}}$']
+    args_list = [(0.01, 20, 3, None, 'log')]
+
     # statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, proportionality_statistic_marginal, Riemaniann_distance_matrix_textures]
     # statistic_names = [r'$\hat{\Lambda}_{\mathrm{Eq}}$', r'$\hat{Lambda}_{\mathrm{lrEq}}$', r'$\hat{Lambda}_{\mathrm{P}}$', r'$\hat{Lambda}_{\mathrm{Rie}}$']
-    args_list = ['log', (1, 0, 'log'), (20, 0.01, 'log'), (1, 0, 0.01, 20, 'log')]
+    # args_list = ['log', (1, 0, 'log'), (20, 0.01, 'log'), (1, 0, 0.01, 20, 'log')]
+    
     number_of_statistics = len(statistic_list)
     function_args = [statistic_list, args_list]
 
@@ -157,9 +182,14 @@ if __name__ == '__main__':
     print( ' (•ㅅ•) || ')
     print( ' / 　 づ')
     t_beginning = time.time()
-    results = sliding_windows_treatment_image_time_series_parallel(image, windows_mask, function_to_compute, 
-                    function_args, multi=enable_multi, number_of_threads_rows=number_of_threads_rows,
-                    number_of_threads_columns=number_of_threads_columns)
+    results = sliding_windows_treatment_image_time_series_parallel(
+        image,
+        windows_mask,
+        function_to_compute,
+        function_args,
+        multi=enable_multi,
+        number_of_threads_rows=number_of_threads_rows,
+        number_of_threads_columns=number_of_threads_columns)
     print("Elpased time: %d s" %(time.time()-t_beginning))
     print('Done')
 
@@ -167,6 +197,8 @@ if __name__ == '__main__':
     # Computing ROC curves
     number_of_points = 30
     ground_truth_original = np.load('./Data/ground_truth_uavsar_scene1.npy')
+    if DEBUG:
+        ground_truth_original = ground_truth_original[(n_r//2)-(new_size_image//2):(n_r//2)+(new_size_image//2), (n_rc//2)-(new_size_image//2):(n_rc//2)+(new_size_image//2)]
     ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
     pfa_array = np.zeros((number_of_points, len(function_args[0])))
     pd_array = np.zeros((number_of_points, len(function_args[0])))
