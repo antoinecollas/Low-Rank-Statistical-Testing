@@ -31,6 +31,14 @@ class uavsar_slc_stack_1x1():
         self.llh_grid = {}
         self.slc_data = {}
 
+    @staticmethod
+    def sort_identifier_list(identifier_list):
+        """ A method to sort identifier list by dates: from the most ancient to most recent """
+        identifier_list = np.array(identifier_list)
+        dates = list()
+        for identifier in identifier_list:
+            dates.append(identifier.split('_')[4])
+        return list(identifier_list[np.argsort(dates)])
 
     def read_data(self, polarisation=['HH', 'HV', 'VV'], segment=1, crop_indexes=None):
         """ A method to read UAVSAR SLC 1x1 data stack
@@ -67,6 +75,7 @@ class uavsar_slc_stack_1x1():
                                       '_'.join(entry.split('_')[-2:]) + '_sSEGMENT'
             if unique_identifiers_time not in self.unique_identifiers_time_list:
                 self.unique_identifiers_time_list.append(unique_identifiers_time)
+        self.unique_identifiers_time_list = self.sort_identifier_list(self.unique_identifiers_time_list)
 
         # Then we read the files one by one for each polarisation and time
         if crop_indexes is not None:
