@@ -96,8 +96,10 @@ if __name__ == '__main__':
     number_of_threads_rows = 2
     number_of_threads_columns = 2
 
-    # Downloading data if needed
+    # data
     PATH = 'Data/UAVSAR/'
+    TIME_SERIES = True # if true: use the full time series, else: use only the first and last images of the time series
+    # Downloading data if needed
     download_uavsar_cd_dataset(path=PATH)
     
     # Reading data using the class
@@ -110,7 +112,7 @@ if __name__ == '__main__':
     print( ' (•ㅅ•) || ')
     print( ' / 　 づ')
     data_class = uavsar_slc_stack_1x1(PATH)
-    data_class.read_data(polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=[28891,31251,2891,3491])
+    data_class.read_data(time_series=TIME_SERIES, polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=[28891,31251,2891,3491])
     if DEBUG:
         n_r, n_rc, _, _ = data_class.data.shape
         new_size_image = 200

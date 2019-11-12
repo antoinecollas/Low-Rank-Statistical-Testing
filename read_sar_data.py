@@ -40,7 +40,7 @@ class uavsar_slc_stack_1x1():
             dates.append(identifier.split('_')[4])
         return list(identifier_list[np.argsort(dates)])
 
-    def read_data(self, polarisation=['HH', 'HV', 'VV'], segment=1, crop_indexes=None):
+    def read_data(self, time_series=True, polarisation=['HH', 'HV', 'VV'], segment=1, crop_indexes=None):
         """ A method to read UAVSAR SLC 1x1 data stack
             Inputs:
                 * polarisation = a list of polarisations to read
@@ -76,6 +76,8 @@ class uavsar_slc_stack_1x1():
             if unique_identifiers_time not in self.unique_identifiers_time_list:
                 self.unique_identifiers_time_list.append(unique_identifiers_time)
         self.unique_identifiers_time_list = self.sort_identifier_list(self.unique_identifiers_time_list)
+        if not time_series:
+            self.unique_identifiers_time_list = [self.unique_identifiers_time_list[0], self.unique_identifiers_time_list[-1]]
 
         # Then we read the files one by one for each polarisation and time
         if crop_indexes is not None:
