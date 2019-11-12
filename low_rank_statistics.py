@@ -64,6 +64,8 @@ def LR_𝜮(𝜮, R,  σ2):
 
     (p,p) = 𝜮.shape
     u, s, vh = np.linalg.svd(𝜮)
+    if σ2 is None:
+        σ2 = np.mean(s[R:])
     s_signal = np.max([s[:R],σ2*np.ones((R,))], axis=0)
     s_noise = σ2 * np.ones((p-R,))
     s = np.diag(np.hstack([s_signal, s_noise]))
@@ -306,7 +308,8 @@ def scale_and_shape_equality_robust_statistic_low_rank(𝐗, args):
                 * tol = tol for tyler estimation
                 * iter_max = maximum number of iterations for tyler estimation
                 * R = rank (put 0 for adaptive estimation)
-                * σ2 = noise level (put 0 for adaptive estimation)
+                * σ2 assumed known (boolean) = if true we estimate σ2 at the beginning, 
+                else it is taken as the mean of p-R lowest eigenvalues when needed.
                 * scale = 'linear' or 'log'
         Outputs:
             * the statistic given the observations in input"""
@@ -318,8 +321,10 @@ def scale_and_shape_equality_robust_statistic_low_rank(𝐗, args):
     # Estimate R and σ2 if needed
     if not R:
         R = Rank_estimation(𝐗.reshape((p, N*T)))
-    if not σ2:
+    if σ2:
         σ2 = σ2_estimaton(𝐗.reshape((p,N*T)), R)
+    else:
+        σ2 = None
 
     # Estimating 𝚺_0 using all the observations
     (𝚺_0, δ, niter) = tyler_estimator_covariance_matandtext_low_rank(𝐗, R, σ2, tol, iter_max)
