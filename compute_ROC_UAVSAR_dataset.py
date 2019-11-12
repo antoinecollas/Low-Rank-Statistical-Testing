@@ -222,7 +222,6 @@ if __name__ == '__main__':
         λ_vec = λ_vec[np.logical_not(np.isinf(λ_vec))]
 
         # Selectionning number_of_points values from beginning to end
-        # indices_λ = np.floor(np.logspace(0, np.log10(len(λ_vec)-1), num=number_of_points)) # logspace
         indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=number_of_points)) # logspace
         λ_vec = np.flip(λ_vec, axis=0)
         λ_vec = λ_vec[indices_λ.astype(int)]
@@ -276,18 +275,4 @@ if __name__ == '__main__':
     plt.legend()
     plt.xlim([0.,1])
     plt.ylim([0,1])
-    # a = plt.axes([.35, .2, .3, .3])
-    # for i_s, statistic in enumerate(statistic_names):
-    #     plt.plot(pfa_array[:,i_s], pd_array[:,i_s], linestyle='--', label=statistic,
-    #         marker=markers[i_s], markersize=4, linewidth=1)
-    # plt.xlim([0.001,0.06])
-    # plt.ylim([0.3,0.7])
-    # plt.xlabel(r'$\mathrm{P}_{\mathrm{FA}}$')
-    # plt.ylabel(r'$\mathrm{P}_{\mathrm{D}}$')
     plt.show()
-
-
-
-
-
-
