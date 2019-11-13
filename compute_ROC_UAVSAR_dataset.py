@@ -93,8 +93,10 @@ if __name__ == '__main__':
     # These two variables serves to split the original image into sub-images to be treated in parallel
     # In general the optimal parameters are obtained for 
     # number_of_threads_rows*number_of_threads_columns = number of cores on the machine
-    number_of_threads_rows = 2
-    number_of_threads_columns = 2
+    number_of_threads_rows = 6
+    number_of_threads_columns = 8
+    if os.cpu_count()!=(number_of_threads_rows*number_of_threads_columns):
+        print('WARNING: not all cpu are used')
 
     # data
     PATH = 'Data/UAVSAR/'
