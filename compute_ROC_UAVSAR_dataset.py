@@ -284,8 +284,7 @@ if __name__ == '__main__':
     markers = ['o', 's', 'h', '*', 'd', 'p']
     plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
     for i_s, statistic in enumerate(statistic_names):
-        plt.plot(pfa_array[:,i_s], pd_array[:,i_s], linestyle='--', label=statistic,
-            marker=markers[i_s], markersize=4, linewidth=1)
+        plt.plot(pfa_array[:,i_s], pd_array[:,i_s], linestyle='--', label=statistic, markersize=4, linewidth=1)
     plt.xlabel(r'$\mathrm{P}_{\mathrm{FA}}$')
     plt.ylabel(r'$\mathrm{P}_{\mathrm{D}}$')
     plt.legend()
