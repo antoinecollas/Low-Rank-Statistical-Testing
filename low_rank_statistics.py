@@ -90,7 +90,7 @@ def Rank_estimation(𝐗):
     return p 
 
 
-def σ2_estimaton(𝐗, R):
+def σ2_estimation(𝐗, R):
     """ Estimate σ2 locally using samples
         ----------------------------------------------
         Inputs:
@@ -138,7 +138,7 @@ def LR_CM_equality_test(𝐗, args):
     if not R:
         R = Rank_estimation(𝐗.reshape((p, N*T)))
     if not σ2:
-        σ2 = σ2_estimaton(𝐗.reshape((p,N*T)), R)
+        σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
 
     # 3) Estimate 𝚺_R under ℋ0 hypothesis
     𝜮 = SCM(X.reshape((p,N*T)))
@@ -189,7 +189,7 @@ def LR_Plug_in_CM_equality_test(𝐗, args):
     if not R:
         R = Rank_estimation(𝐗.reshape((p, N*T)))
     if not σ2:
-        σ2 = σ2_estimaton(𝐗.reshape((p,N*T)), R)
+        σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
 
     S = SCM(𝐗.reshape((p, N*T)))
     S = LR_𝜮(S, R,  σ2)
@@ -322,7 +322,7 @@ def scale_and_shape_equality_robust_statistic_low_rank(𝐗, args):
     if not R:
         R = Rank_estimation(𝐗.reshape((p, N*T)))
     if σ2:
-        σ2 = σ2_estimaton(𝐗.reshape((p,N*T)), R)
+        σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
     else:
         σ2 = None
 
