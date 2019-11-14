@@ -124,7 +124,8 @@ def LR_CM_equality_test(𝐗, args):
                 * T = Number of groups of samples
             * args = (R, σ2, scale) with
                 * R = rank (put 0 for adaptive estimation)
-                * σ2 = noise level (put 0 for adaptive estimation)
+                * σ2 assumed known (boolean) = if true we estimate σ2 at the beginning, 
+                else it is taken as the mean of p-R lowest eigenvalues when needed.
                 * scale = 'linear' or 'log'
         Outputs:
         ---------
@@ -137,8 +138,10 @@ def LR_CM_equality_test(𝐗, args):
     # 2) Estimate R and σ2 if needed
     if not R:
         R = Rank_estimation(𝐗.reshape((p, N*T)))
-    if not σ2:
+    if σ2:
         σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
+    else:
+        σ2 = None
 
     # 3) Estimate 𝚺_R under ℋ0 hypothesis
     𝜮 = SCM(X.reshape((p,N*T)))
@@ -175,7 +178,8 @@ def LR_Plug_in_CM_equality_test(𝐗, args):
                 * T = Number of groups of samples
             * args = (R, σ2, scale) with
                 * R = rank (put 0 for adaptive estimation)
-                * σ2 = noise level (put 0 for adaptive estimation)
+                * σ2 assumed known (boolean) = if true we estimate σ2 at the beginning, 
+                else it is taken as the mean of p-R lowest eigenvalues when needed.
                 * scale = 'linear' or 'log'
         Outputs:
         ---------
@@ -188,8 +192,10 @@ def LR_Plug_in_CM_equality_test(𝐗, args):
     # 2) Estimate R and σ2 if needed
     if not R:
         R = Rank_estimation(𝐗.reshape((p, N*T)))
-    if not σ2:
+    if σ2:
         σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
+    else:
+        σ2 = None
 
     S = SCM(𝐗.reshape((p, N*T)))
     S = LR_𝜮(S, R,  σ2)

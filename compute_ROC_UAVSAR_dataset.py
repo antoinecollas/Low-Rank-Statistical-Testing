@@ -180,13 +180,13 @@ if __name__ == '__main__':
     # Low rank Compound Gaussian
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank]
     # statistic_names = [r'$\hat{=\Lambda}_{\mathrm{LRCG}}$']
-    # args_list = [(0.01, 20, 3, None, 'log')]
+    # args_list = [(0.01, 20, 3, False, 'log')]
 
     # Comparaison of the 4 models
     statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
     statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{LRG}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
-    args_list = ['log', (3, None, 'log'), (0.01, 20, 'log'), (0.01, 20, 3, None, 'log')]
-    
+    args_list = ['log', (3, False, 'log'), (0.01, 20, 'log'), (0.01, 20, 3, False, 'log')]
+
     # Comparaison of 2 methods of evaluating σ2
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank, scale_and_shape_equality_robust_statistic_low_rank]
     # statistic_names = [r'$\hat{\Lambda}_{\mathrm{LRCG}, \sigma2 \mathrm{a priori}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}, \sigma2 \mathrm{GLRT}}$']
@@ -196,7 +196,7 @@ if __name__ == '__main__':
     # rank_list = [(i+1) for i in range(p)]
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank for i in range(len(rank_list))]
     # statistic_names = ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in rank_list]
-    # args_list = [(0.01, 20, rank, None, 'log') for rank in rank_list]
+    # args_list = [(0.01, 20, rank, False, 'log') for rank in rank_list]
 
     number_of_statistics = len(statistic_list)
     function_args = [statistic_list, args_list]
