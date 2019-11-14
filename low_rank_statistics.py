@@ -63,6 +63,9 @@ def LR_𝜮(𝜮, R,  σ2):
             * the LR regularised matrix """
 
     (p,p) = 𝜮.shape
+    if R==p:
+        return 𝚺
+
     u, s, vh = np.linalg.svd(𝜮)
     if σ2 is None:
         σ2 = np.mean(s[R:])
