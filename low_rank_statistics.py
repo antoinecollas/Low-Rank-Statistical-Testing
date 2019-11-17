@@ -77,8 +77,67 @@ def LR_𝜮(𝜮, R,  σ2):
     return 𝚺_R
 
 
-def Rank_estimation(𝐗):
-    """ Not implemented yet but model order selection
+def information_criterion(s):
+    """ Implements information criterion of AIC/BIC methods
+    ----------------------------------------------
+    Inputs:
+    --------
+        * s = (p) numpy array of eigenvalues
+    Outputs:
+    ---------
+        * the information criterion """
+    p = len(s)
+    k = np.arange(p-1)
+    l = p - k
+    numerator = np.zeros(len(k))
+    for idx in k:
+        power = 1/(p-idx-1)
+        temp = 1
+        for idx2 in range(idx,p):
+            temp = temp*(s[idx2]**power)
+        numerator[idx] = temp
+    denominator = np.cumsum(s[::-1])[1:][::-1]
+    ic = np.log(l*numerator/denominator)
+    return ic
+
+def AIC_criterion(s, n):
+    """ AIC criterion for order selection
+    ----------------------------------------------
+    Inputs:
+    --------
+        * s = a (p) numpy array of eigenvalues of SCM
+        * n = number of samples used for computing the SCM
+    Outputs:
+    ---------
+        * the criterion """
+    p = len(s)
+    k = np.arange(p-1)
+    l = p - k
+    ic = information_criterion(s)
+    criterion = n*l*ic+k*(l+p)
+    return criterion
+    
+
+def BIC_criterion(s, n):
+    """ BIC criterion for order selection
+    ----------------------------------------------
+    Inputs:
+    --------
+        * s = a (p) numpy array of eigenvalues of SCM
+        * n = number of samples used for computing the SCM
+    Outputs:
+    ---------
+        * the criterion """
+    p = len(s)
+    k = np.arange(p-1)
+    l = p - k
+    ic = information_criterion(s)
+    criterion = 2*n*l*ic+k*(l+p)*np.log(n)
+    return criterion
+
+
+def rank_estimation(𝐗, method='AIC'):
+    """ order selection using AIC or BIC methods
         ----------------------------------------------
         Inputs:
         --------
@@ -88,9 +147,18 @@ def Rank_estimation(𝐗):
         Outputs:
         ---------
             * the Rank """
-
-    (p, N) = 𝐗.shape
-    return p 
+    (_, N) = 𝐗.shape
+    𝚺 = SCM(X)
+    u, s, vh = np.linalg.svd(𝚺)
+    ic = information_criterion(𝚺)
+    if method == 'AIC':
+        criterion = AIC_criterion(s, N)
+    elif method == 'BIC':
+        criterion = BIC_criterion(s, N)
+    else:
+        raise
+    rank = np.argmin(criterion) + 1
+    return (rank, criterion)
 
 
 def σ2_estimation(𝐗, R):
@@ -140,7 +208,7 @@ def LR_CM_equality_test(𝐗, args):
 
     # 2) Estimate R and σ2 if needed
     if not R:
-        R = Rank_estimation(𝐗.reshape((p, N*T)))
+        R = rank_estimation(𝐗.reshape((p, N*T)))
     if σ2:
         σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
     else:
@@ -194,7 +262,7 @@ def LR_Plug_in_CM_equality_test(𝐗, args):
 
     # 2) Estimate R and σ2 if needed
     if not R:
-        R = Rank_estimation(𝐗.reshape((p, N*T)))
+        R = rank_estimation(𝐗.reshape((p, N*T)))
     if σ2:
         σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
     else:
@@ -329,7 +397,7 @@ def scale_and_shape_equality_robust_statistic_low_rank(𝐗, args):
 
     # Estimate R and σ2 if needed
     if not R:
-        R = Rank_estimation(𝐗.reshape((p, N*T)))
+        R = rank_estimation(𝐗.reshape((p, N*T)))
     if σ2:
         σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
     else:
