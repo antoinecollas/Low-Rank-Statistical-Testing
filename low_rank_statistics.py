@@ -47,11 +47,11 @@ def Gaussian_Log_Likelihood(𝐗, 𝛍, 𝚺):
     𝐗_centered = 𝐗 - np.tile(𝛍.reshape((p,1)), (1,N))
     𝐒 = SCM(𝐗_centered)
     ℓogℒ = - N*p*np.log(np.pi) - N*np.log(np.abs(np.linalg.det(𝚺))) - \
-            np.trace(𝐒@np.linalg.inv(𝜮))
+            np.trace(𝐒@np.linalg.inv(𝚺))
     return ℓogℒ
 
-def LR_𝜮(𝜮, R,  σ2):
-    """ Low-Rank operator on 𝜮
+def LR_𝜮(𝚺, R,  σ2):
+    """ Low-Rank operator on 𝚺
         ----------------------------------------------
         Inputs:
         --------
@@ -62,11 +62,11 @@ def LR_𝜮(𝜮, R,  σ2):
         ---------
             * the LR regularised matrix """
 
-    (p,p) = 𝜮.shape
+    (p,p) = 𝚺.shape
     if R==p:
         return 𝚺
 
-    u, s, vh = np.linalg.svd(𝜮)
+    u, s, vh = np.linalg.svd(𝚺)
     if σ2 is None:
         σ2 = np.mean(s[R:])
     s_signal = np.max([s[:R],σ2*np.ones((R,))], axis=0)
@@ -150,7 +150,6 @@ def rank_estimation(𝐗, method='AIC'):
     (_, N) = 𝐗.shape
     𝚺 = SCM(X)
     u, s, vh = np.linalg.svd(𝚺)
-    ic = information_criterion(𝚺)
     if method == 'AIC':
         criterion = AIC_criterion(s, N)
     elif method == 'BIC':
@@ -158,7 +157,7 @@ def rank_estimation(𝐗, method='AIC'):
     else:
         raise
     rank = np.argmin(criterion) + 1
-    return (rank, criterion)
+    return rank
 
 
 def σ2_estimation(𝐗, R):
@@ -215,8 +214,8 @@ def LR_CM_equality_test(𝐗, args):
         σ2 = None
 
     # 3) Estimate 𝚺_R under ℋ0 hypothesis
-    𝜮 = SCM(X.reshape((p,N*T)))
-    𝜮_R = LR_𝜮(𝜮, R, σ2)
+    𝚺 = SCM(X.reshape((p,N*T)))
+    𝜮_R = LR_𝜮(𝚺, R, σ2)
 
     # 4) Estimate 𝚺t_R under ℋ1 hypothesis
     𝜮t_R = np.zeros((p,p,T)).astype(complex)
