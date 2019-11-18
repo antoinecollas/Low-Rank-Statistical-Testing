@@ -316,6 +316,9 @@ def tyler_estimator_covariance_low_rank(𝐗, R, σ2, tol=0.001, iter_max=20):
         # Imposing low rank structure
         𝚺_new = LR_𝜮(𝚺_new, R, σ2)
 
+        # Normalisation
+        𝚺_new = 𝚺_new/np.trace(𝚺_new)
+
         # Condition for stopping
         δ = np.linalg.norm(𝚺_new - 𝚺, 'fro') / np.linalg.norm(𝚺, 'fro')
         iteration = iteration + 1
@@ -361,6 +364,9 @@ def tyler_estimator_covariance_matandtext_low_rank(𝐗, R, σ2, tol, iter_max):
 
         # Imposing low rank structure
         𝚺_new = LR_𝜮(𝚺_new, R, σ2)
+
+        # Normalisation
+        𝚺_new = 𝚺_new/np.trace(𝚺_new)
 
         # Condition for stopping
         δ = np.linalg.norm(𝚺_new - 𝚺, 'fro') / np.linalg.norm(𝚺, 'fro')
