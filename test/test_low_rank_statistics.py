@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from low_rank_statistics import information_criterion, AIC_criterion
+from LRST.low_rank_statistics import information_criterion, AIC_criterion
 
 def test_information_criterion():
     s = np.array([2, 0.5, 0.1])

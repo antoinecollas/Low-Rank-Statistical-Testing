@@ -17,12 +17,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##############################################################################
-from generic_functions import *
+from LRST.generic_functions import *
 import matplotlib.pyplot as plt
-from monte_carlo_tools import *
-from change_detection_functions import *
-from low_rank_statistics import *
-from proportionality_statistics import *
+from LRST.monte_carlo_tools import *
+from LRST.change_detection_functions import *
+from LRST.low_rank_statistics import *
+from LRST.proportionality_statistics import *
 import os
 import time
 import scipy as sp

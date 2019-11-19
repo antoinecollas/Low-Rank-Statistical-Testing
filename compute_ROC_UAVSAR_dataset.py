@@ -18,22 +18,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##############################################################################
-from generic_functions import *
+from LRST.generic_functions import *
 import matplotlib.pyplot as plt
-from monte_carlo_tools import *
-from multivariate_images_tools import *
-from change_detection_functions import *
-from low_rank_statistics import *
-from proportionality_statistics import *
-from read_sar_data import *
-from wavelet_functions import *
+from LRST.monte_carlo_tools import *
+from LRST.multivariate_images_tools import *
+from LRST.change_detection_functions import *
+from LRST.low_rank_statistics import *
+from LRST.proportionality_statistics import *
+from LRST.read_sar_data import *
+from LRST.wavelet_functions import *
 import os
 import time
 import seaborn as sns
 sns.set_style("darkgrid")
 
 
-def download_uavsar_cd_dataset(path='./Data/'):
+def download_uavsar_cd_dataset(path='./data/'):
 
     # if directory exists just catch error
     try:
@@ -99,7 +99,7 @@ if __name__ == '__main__':
         print('WARNING: not all cpu are used')
 
     # data
-    PATH = 'Data/UAVSAR/'
+    PATH = 'data/UAVSAR/'
     TIME_SERIES = True # if true: use the full time series, else: use only the first and last images of the time series
     # Downloading data if needed
     download_uavsar_cd_dataset(path=PATH)
@@ -168,9 +168,9 @@ if __name__ == '__main__':
     # args_list = ['log']
 
     # Low rank Gaussian
-    # statistic_list = [LR_CM_equality_test]
-    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{LRG}}$']
-    # args_list = [(3, None, 'log')]
+    # statistic_list = [LR_CM_equality_test, LR_CM_equality_test, LR_CM_equality_test]
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{LRG}},{\mathrm{AIC}}$', r'$\hat{\Lambda}_{\mathrm{LRG}},{\mathrm{Rank=1}}$', r'$\hat{\Lambda}_{\mathrm{LRG}},{\mathrm{Rank=3}}$']
+    # args_list = [(None, False, 'log'), (1, False, 'log'), (3, False, 'log')]
 
     # Compound Gaussian
     # statistic_list = [scale_and_shape_equality_robust_statistic]
@@ -180,20 +180,26 @@ if __name__ == '__main__':
     # Low rank Compound Gaussian
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank]
     # statistic_names = [r'$\hat{=\Lambda}_{\mathrm{LRCG}}$']
-    # args_list = [(0.01, 20, 3, False, 'log')]
+    # args_list = [(0.01, 20, None, False, 'log')]
 
     # Comparaison of the 4 models
     statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
     statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{LRG}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
-    args_list = ['log', (3, False, 'log'), (0.01, 20, 'log'), (0.01, 20, 3, False, 'log')]
+    args_list = ['log', (1, False, 'log'), (0.01, 20, 'log'), (0.01, 20, 1, False, 'log')]
 
     # Comparaison of 2 methods of evaluating σ2
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank, scale_and_shape_equality_robust_statistic_low_rank]
     # statistic_names = [r'$\hat{\Lambda}_{\mathrm{LRCG}, \sigma2 \mathrm{a priori}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}, \sigma2 \mathrm{GLRT}}$']
-    # args_list = [(0.01, 20, 3, True, 'log'), (0.01, 20, 3, False, 'log')]
+    # args_list = [(0.01, 20, 4, True, 'log'), (0.01, 20, 4, False, 'log')]
+
+    # Test the robustness to the rank of LRG
+    # rank_list = [(i+1) for i in range(10)]
+    # statistic_list = [LR_CM_equality_test for i in range(len(rank_list))]
+    # statistic_names = ['$\hat{\Lambda}_{\mathrm{LRG, R='+str(rank)+'}}$' for rank in rank_list]
+    # args_list = [(rank, False, 'log') for rank in rank_list]
 
     # Test the robustness to the rank of LRCG
-    # rank_list = [(i+1) for i in range(p)]
+    # rank_list = [(i+1) for i in range(10)]
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank for i in range(len(rank_list))]
     # statistic_names = ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in rank_list]
     # args_list = [(0.01, 20, rank, False, 'log') for rank in rank_list]
@@ -225,7 +231,7 @@ if __name__ == '__main__':
 
     # Computing ROC curves
     number_of_points = 30
-    ground_truth_original = np.load('./Data/ground_truth_uavsar_scene1.npy')
+    ground_truth_original = np.load('./data/ground_truth_uavsar_scene1.npy')
     if DEBUG:
         ground_truth_original = ground_truth_original[(n_r//2)-(new_size_image//2):(n_r//2)+(new_size_image//2), (n_rc//2)-(new_size_image//2):(n_rc//2)+(new_size_image//2)]
     ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
@@ -273,15 +279,14 @@ if __name__ == '__main__':
     for i_s, statistic in enumerate(statistic_names):
         plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
         image_temp = np.nan*np.ones((number_pixels_azimuth, number_pixels_range))
-        image_temp[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)] = (results[:,:,i_s] - results[:,:,i_s].min())# / (results[:,:,i_s].max() - results[:,:,i_s].min())
+        image_temp[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)] = (results[:,:,i_s] - results[:,:,i_s].min()) / (results[:,:,i_s].max() - results[:,:,i_s].min())
         plt.pcolormesh(X,Y, image_temp, cmap='jet')
         plt.xlabel(r'Azimuth (m)')
         plt.ylabel(r'Range (m)')
-        # plt.title(statistic)
+        plt.title(statistic)
         plt.colorbar()
 
     # Showing statistics results ROC
-    markers = ['o', 's', 'h', '*', 'd', 'p']
     plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
     for i_s, statistic in enumerate(statistic_names):
         plt.plot(pfa_array[:,i_s], pd_array[:,i_s], linestyle='--', label=statistic, markersize=4, linewidth=1)
