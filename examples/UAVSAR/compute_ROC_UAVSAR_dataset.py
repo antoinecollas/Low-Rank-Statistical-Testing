@@ -81,33 +81,19 @@ def download_uavsar_cd_dataset(path='./data/'):
             print("File %s not found, downloading it" % file_url.split('/')[-1])
             wget.download(url=file_url, out=path+file_url.split('/')[-1])
 
+def load_UAVSAR(path, debug, full_time_series):
+    """ Function which loads UAVSAR time series with its ground truth. It also applies a wavelet decomposition.
 
+    Inputs:
+        * path = base path to find the data
+        * debug = if true, only a a small square of the time series is loaded
+        * full_time_series = if true, loads the full time series, otherwhise loads only first and last images
+    Outputs:
+        * image = the time series of shape (rows, columns, p, T)
+        * ground truth the time series (rows, columns)"""
 
-if __name__ == '__main__':
-
-    # DEBUG mode for fast debugging (use a small patch of 200x200 pixels)
-    DEBUG = False
-
-    # Activate latex in figures (or not)
-    latex_in_figures = True
-    if latex_in_figures:
-      enable_latex_infigures()
-
-    # Enable parallel processing (or not)
-    enable_multi = True
-    # These two variables serves to split the original image into sub-images to be treated in parallel
-    # In general the optimal parameters are obtained for 
-    # number_of_threads_rows*number_of_threads_columns = number of cores on the machine
-    number_of_threads_rows = 6
-    number_of_threads_columns = 8
-    if os.cpu_count()!=(number_of_threads_rows*number_of_threads_columns):
-        print('WARNING: not all cpu are used')
-
-    # data
-    PATH = 'data/UAVSAR/'
-    TIME_SERIES = True # if true: use the full time series, else: use only the first and last images of the time series
     # Downloading data if needed
-    download_uavsar_cd_dataset(path=PATH)
+    download_uavsar_cd_dataset(path=path)
     
     # Reading data using the class
     print( '|￣￣￣￣￣￣￣￣|')
@@ -118,9 +104,9 @@ if __name__ == '__main__':
     print( ' (\__/) ||') 
     print( ' (•ㅅ•) || ')
     print( ' / 　 づ')
-    data_class = uavsar_slc_stack_1x1(PATH)
-    data_class.read_data(time_series=TIME_SERIES, polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=[28891,31251,2891,3491])
-    if DEBUG:
+    data_class = uavsar_slc_stack_1x1(path)
+    data_class.read_data(time_series=full_time_series, polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=[28891,31251,2891,3491])
+    if debug:
         n_r, n_rc, _, _ = data_class.data.shape
         new_size_image = 200
         data_class.data = data_class.data[(n_r//2)-(new_size_image//2):(n_r//2)+(new_size_image//2), (n_rc//2)-(new_size_image//2):(n_rc//2)+(new_size_image//2), :, :]
@@ -131,7 +117,9 @@ if __name__ == '__main__':
     bandwith = float(data_class.meta_data['SanAnd_26524_09014_007_090423_L090HH_03_BC']['Bandwidth']) * 10**6 # Hz
     range_resolution = float(data_class.meta_data['SanAnd_26524_09014_007_090423_L090HH_03_BC']['1x1 SLC Range Pixel Spacing']) # m, for 1x1 slc data
     azimuth_resolution = float(data_class.meta_data['SanAnd_26524_09014_007_090423_L090HH_03_BC']['1x1 SLC Azimuth Pixel Spacing']) # m, for 1x1 slc data
+
     number_pixels_azimuth, number_pixels_range, p, T = data_class.data.shape
+
     range_vec = np.linspace(-0.5,0.5,number_pixels_range) * range_resolution * number_pixels_range
     azimuth_vec = np.linspace(-0.5,0.5,number_pixels_azimuth) * azimuth_resolution * number_pixels_azimuth
     Y, X = np.meshgrid(range_vec,azimuth_vec)
@@ -160,6 +148,36 @@ if __name__ == '__main__':
     image_temp = None
     print('Done')
 
+    ground_truth_original = np.load('./data/ground_truth_uavsar_scene1.npy')
+    if debug:
+        ground_truth_original = ground_truth_original[(n_r//2)-(new_size_image//2):(n_r//2)+(new_size_image//2), (n_rc//2)-(new_size_image//2):(n_rc//2)+(new_size_image//2)]
+
+    return image, ground_truth_original, X, Y
+
+if __name__ == '__main__':
+    # Activate latex in figures (or not)
+    latex_in_figures = True
+    if latex_in_figures:
+      enable_latex_infigures()
+
+    # Enable parallel processing (or not)
+    enable_multi = True
+    # These two variables serves to split the original image into sub-images to be treated in parallel
+    # In general the optimal parameters are obtained for 
+    # number_of_threads_rows*number_of_threads_columns = number of cores on the machine
+    number_of_threads_rows = 6
+    number_of_threads_columns = 8
+    if os.cpu_count()!=(number_of_threads_rows*number_of_threads_columns):
+        print('WARNING: not all cpu are used')
+    
+    # data
+
+    # DEBUG mode for fast debugging (use a small patch of 200x200 pixels)
+    DEBUG = False
+    PATH = 'data/UAVSAR/'
+    FULL_TIME_SERIES = False # if true: use the full time series, else: use only the first and last images of the time series
+
+    image, ground_truth_original, X, Y = load_UAVSAR(PATH, DEBUG, FULL_TIME_SERIES)
 
     # Parameters
     n_r, n_rc, p, T = image.shape
@@ -167,10 +185,12 @@ if __name__ == '__main__':
     m_r, m_c = windows_mask.shape
     function_to_compute = compute_several_statistics
 
+    ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
+
     # Gaussian
-    # statistic_list = [covariance_equality_glrt_gaussian_statistic]
-    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$']
-    # args_list = ['log']
+    statistic_list = [covariance_equality_glrt_gaussian_statistic]
+    statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$']
+    args_list = ['log']
 
     # Low rank Gaussian
     # statistic_list = [LR_CM_equality_test, LR_CM_equality_test, LR_CM_equality_test]
@@ -188,9 +208,9 @@ if __name__ == '__main__':
     # args_list = [(0.01, 20, None, False, 'log')]
 
     # Comparaison of the 4 models
-    statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
-    statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{LRG}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
-    args_list = ['log', (1, False, 'log'), (0.01, 20, 'log'), (0.01, 20, 1, False, 'log')]
+    # statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{LRG}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
+    # args_list = ['log', (1, False, 'log'), (0.01, 20, 'log'), (0.01, 20, 1, False, 'log')]
 
     # Comparaison of 2 methods of evaluating σ2
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank, scale_and_shape_equality_robust_statistic_low_rank]
@@ -236,10 +256,6 @@ if __name__ == '__main__':
 
     # Computing ROC curves
     number_of_points = 30
-    ground_truth_original = np.load('./data/ground_truth_uavsar_scene1.npy')
-    if DEBUG:
-        ground_truth_original = ground_truth_original[(n_r//2)-(new_size_image//2):(n_r//2)+(new_size_image//2), (n_rc//2)-(new_size_image//2):(n_rc//2)+(new_size_image//2)]
-    ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
     pfa_array = np.zeros((number_of_points, len(function_args[0])))
     pd_array = np.zeros((number_of_points, len(function_args[0])))
     for i_s, statistic in enumerate(statistic_names):
@@ -283,7 +299,7 @@ if __name__ == '__main__':
     # Showing statistics results raw
     for i_s, statistic in enumerate(statistic_names):
         plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
-        image_temp = np.nan*np.ones((number_pixels_azimuth, number_pixels_range))
+        image_temp = np.nan*np.ones((n_r, n_rc))
         image_temp[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)] = (results[:,:,i_s] - results[:,:,i_s].min()) / (results[:,:,i_s].max() - results[:,:,i_s].min())
         plt.pcolormesh(X,Y, image_temp, cmap='jet')
         plt.xlabel(r'Azimuth (m)')

@@ -37,10 +37,9 @@ from LRST.low_rank_statistics import *
 from LRST.proportionality_statistics import *
 from LRST.read_sar_data import *
 from LRST.wavelet_functions import *
-from compute_ROC_UAVSAR_dataset import download_uavsar_cd_dataset
+from compute_ROC_UAVSAR_dataset import load_UAVSAR
 
 if __name__ == '__main__':
-
     # Activate latex in figures (or not)
     latex_in_figures = False
     if latex_in_figures:
@@ -57,63 +56,21 @@ if __name__ == '__main__':
         print('WARNING: not all cpu are used')
 
     # data
+
+    # DEBUG mode for fast debugging (use a small patch of 200x200 pixels)
+    DEBUG = False
     PATH = 'data/UAVSAR/'
-    TIME_SERIES = True # if true: use the full time series, else: use only the first and last images of the time series
-    # Downloading data if needed
-    download_uavsar_cd_dataset(path=PATH)
-    
-    # Reading data using the class
-    print( '|￣￣￣￣￣￣￣￣|')
-    print( '|   READING     |') 
-    print( '|   dataset     |')
-    print( '|               |' )  
-    print( '| ＿＿＿_＿＿＿＿|') 
-    print( ' (\__/) ||') 
-    print( ' (•ㅅ•) || ')
-    print( ' / 　 づ')
-    data_class = uavsar_slc_stack_1x1(PATH)
-    data_class.read_data(time_series=TIME_SERIES, polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=[28891,31251,2891,3491])
-    print('Done')
+    FULL_TIME_SERIES = False # if true: use the full time series, else: use only the first and last images of the time series
 
-    # Spatial vectors
-    center_frequency = 1.26e+9 # GHz, for L Band
-    bandwith = float(data_class.meta_data['SanAnd_26524_09014_007_090423_L090HH_03_BC']['Bandwidth']) * 10**6 # Hz
-    range_resolution = float(data_class.meta_data['SanAnd_26524_09014_007_090423_L090HH_03_BC']['1x1 SLC Range Pixel Spacing']) # m, for 1x1 slc data
-    azimuth_resolution = float(data_class.meta_data['SanAnd_26524_09014_007_090423_L090HH_03_BC']['1x1 SLC Azimuth Pixel Spacing']) # m, for 1x1 slc data
-    number_pixels_azimuth, number_pixels_range, p, T = data_class.data.shape
-    range_vec = np.linspace(-0.5,0.5,number_pixels_range) * range_resolution * number_pixels_range
-    azimuth_vec = np.linspace(-0.5,0.5,number_pixels_azimuth) * azimuth_resolution * number_pixels_azimuth
-    Y, X = np.meshgrid(range_vec,azimuth_vec)
-
-    # Decomposition parameters (j=1 always because reasons)
-    R = 2
-    L = 2
-    d_1 = 10
-    d_2 = 10
-
-    # Wavelet decomposition of the time series
-    print( '|￣￣￣￣￣￣￣￣|')
-    print( '|   Wavelet     |') 
-    print( '| decomposition |')
-    print( '|               |' )  
-    print( '| ＿＿＿_＿＿＿＿|') 
-    print( ' (\__/) ||') 
-    print( ' (•ㅅ•) || ')
-    print( ' / 　 づ')
-    image = np.zeros((number_pixels_azimuth, number_pixels_range, p*R*L, T), dtype=complex)
-    for t in range(T):
-        for i_p in range(p):
-            image_temp = decompose_image_wavelet(data_class.data[:,:,i_p,t], bandwith, range_resolution, azimuth_resolution, center_frequency,
-                                    R, L, d_1, d_2)
-            image[:,:,i_p*R*L:(i_p+1)*R*L, t] = image_temp
-    image_temp = None
-    print('Done')
+    image, ground_truth_original, X, Y = load_UAVSAR(PATH, DEBUG, FULL_TIME_SERIES)
 
     # Parameters
     n_r, n_rc, p, T = image.shape
     windows_mask = np.ones((5,5))
     m_r, m_c = windows_mask.shape
     function_to_compute = compute_several_statistics
+
+    ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
 
     statistic_list = [eigenvalues_SCM]
     statistic_names = [r'Eigenvalues']
