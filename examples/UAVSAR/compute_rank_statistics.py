@@ -18,6 +18,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##############################################################################
+import os, sys, time
+
+# import path of root repo
+current_dir = os.path.dirname(os.path.abspath(__file__))
+temp = os.path.dirname(os.path.dirname(current_dir))
+sys.path.insert(1, temp)
+
+import seaborn as sns
+sns.set_style("darkgrid")
+
 from LRST.generic_functions import *
 import matplotlib.pyplot as plt
 from LRST.monte_carlo_tools import *
@@ -27,10 +37,7 @@ from LRST.low_rank_statistics import *
 from LRST.proportionality_statistics import *
 from LRST.read_sar_data import *
 from LRST.wavelet_functions import *
-import os
-import time
-import seaborn as sns
-sns.set_style("darkgrid")
+from compute_ROC_UAVSAR_dataset import download_uavsar_cd_dataset
 
 if __name__ == '__main__':
 

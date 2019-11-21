@@ -1,3 +1,10 @@
+import os, sys, time
+
+# import path of root repo
+current_dir = os.path.dirname(os.path.abspath(__file__))
+temp = os.path.dirname(current_dir)
+sys.path.insert(1, temp)
+
 import numpy as np
 import pytest
 from LRST.low_rank_statistics import information_criterion, AIC_criterion
