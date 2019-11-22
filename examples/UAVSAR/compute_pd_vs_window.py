@@ -27,6 +27,7 @@ sys.path.insert(1, temp)
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 sns.set_style('darkgrid')
 
 from tqdm import tqdm
@@ -44,7 +45,7 @@ from compute_ROC_UAVSAR_dataset import load_UAVSAR
 
 if __name__ == '__main__':
     # DEBUG mode for fast debugging (use a small patch)
-    DEBUG = True
+    DEBUG = False
     PATH = 'data/UAVSAR/'
     FULL_TIME_SERIES = False # if true: use the full time series, else: use only the first and last images of the time series
 
@@ -127,7 +128,6 @@ if __name__ == '__main__':
     print('Done')
 
     # Computing pd
-    number_of_points = 1000
     λ_pfa_threshold = np.zeros((len(function_args[0]), len(WINDOWS_SIZES)))
     pd_array = np.zeros((len(function_args[0]), len(WINDOWS_SIZES)))
 
@@ -150,10 +150,12 @@ if __name__ == '__main__':
     # pd_array is a matrix of shape (nb_rank_tested, nb_windows_sizes_tested)
 
     # Showing statistics results ROC
-    plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
+    fig = plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
     for i_s, statistic in enumerate(statistic_names):
         plt.plot(WINDOWS_SIZES, pd_array[i_s,:], linestyle='--', label=statistic, markersize=4, linewidth=1)
-    plt.xlabel(r'$Window size$')
+    ax = fig.axes[0]
+    ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    plt.xlabel(r'Window size')
     plt.ylabel(r'$P_D$')
     plt.legend()
     plt.show()
