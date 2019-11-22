@@ -41,12 +41,12 @@ from compute_ROC_UAVSAR_dataset import load_UAVSAR
 
 if __name__ == '__main__':
     # Activate latex in figures (or not)
-    latex_in_figures = False
-    if latex_in_figures:
+    LATEX_IN_FIGURES = False
+    if LATEX_IN_FIGURES:
       enable_latex_infigures()
 
     # Enable parallel processing (or not)
-    enable_multi = True
+    ENABLE_MULTI = True
     # These two variables serves to split the original image into sub-images to be treated in parallel
     # In general the optimal parameters are obtained for 
     # number_of_threads_rows*number_of_threads_columns = number of cores on the machine
@@ -95,7 +95,7 @@ if __name__ == '__main__':
         windows_mask,
         function_to_compute,
         function_args,
-        multi=enable_multi,
+        multi=ENABLE_MULTI,
         number_of_threads_rows=number_of_threads_rows,
         number_of_threads_columns=number_of_threads_columns)
     print("Elpased time: %d s" %(time.time()-t_beginning))

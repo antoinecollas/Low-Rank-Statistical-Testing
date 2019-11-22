@@ -37,12 +37,12 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------------------------------------------
 
     # Activate latex in figures (or not)
-    latex_in_figures = True
-    if latex_in_figures:
+    LATEX_IN_FIGURES = True
+    if LATEX_IN_FIGURES:
       enable_latex_infigures()
 
     # Enable parallel processing (or not)
-    enable_multi = True
+    ENABLE_MULTI = True
     # These two variables serves to split an image into sub-images to be treated in parallel
     # In general the optimal parameters are obtained for 
     # number_of_threads_rows*number_of_threads_columns = number of cores on the machine
@@ -103,7 +103,7 @@ if __name__ == '__main__':
     # Doing simulation
     λ_vec_temp = np.array(compute_monte_carlo_parallel(data_generation_function, data_generation_args, 
                                         function_to_compute, function_args, 
-                                        number_of_trials, multi=enable_multi, number_of_threads=number_of_threads))
+                                        number_of_trials, multi=ENABLE_MULTI, number_of_threads=number_of_threads))
     # Sorting values
     Pfa_vec = np.arange(number_of_trials, 0,-1)/number_of_trials
     λ_vec_temp = np.sort(λ_vec_temp, axis=0)
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     # Doing simulation
     results = np.array(compute_monte_carlo_parallel(data_generation_function, data_generation_args, 
                                         function_to_compute, function_args, 
-                                        number_of_trials, multi=enable_multi, number_of_threads=number_of_threads))
+                                        number_of_trials, multi=ENABLE_MULTI, number_of_threads=number_of_threads))
 
     # Computing PD for each value of threshold
     PD_vec = np.zeros((len(Pfa_vec), number_of_statistics))

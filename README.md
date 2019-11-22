@@ -33,8 +33,8 @@ python compute_ROC_UAVSAR_dataset.py
 	- wget (if you do not have the UAVSAR data yet)
 	- tqdm
 
-The code use parallel processing which can be disabled by putting the boolean enable_multi to False in each file.
-The figures can be plotted using Latex formatting by putting the boolean latex_in_figures to True in each file (must have a latex distribution installed).
+The code use parallel processing which can be disabled by putting the boolean ENABLE_MULTI to False in each file.
+The figures can be plotted using Latex formatting by putting the boolean LATEX_IN_FIGURES to True in each file (must have a latex distribution installed).
 
 Dataset available at https://uavsar.jpl.nasa.gov/.
 
