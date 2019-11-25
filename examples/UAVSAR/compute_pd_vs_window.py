@@ -156,7 +156,7 @@ if __name__ == '__main__':
     # Showing statistics results ROC
     fig = plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
     for i_s, statistic in enumerate(statistic_names):
-        plt.plot(WINDOWS_SIZES, pd_array[i_s,:], linestyle='--', label=statistic, markersize=4, linewidth=1)
+        plt.plot(WINDOWS_SIZES, pd_array[i_s,:], linestyle='-', marker='o', label=statistic, markersize=4, linewidth=1)
     ax = fig.axes[0]
     ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
     plt.xlabel(r'Window size')
