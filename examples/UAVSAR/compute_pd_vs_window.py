@@ -70,20 +70,21 @@ if __name__ == '__main__':
     # Parameters
     if DEBUG:
         WINDOWS_SIZES = np.arange(start=5, stop=9, step=2)
-        MAXIMUM_RANK = 2
+        RANKS_LIST = np.arange(start=1, stop=5, step=2)
     else:
-        WINDOWS_SIZES = np.arange(start=5, stop=17, step=2)
-        MAXIMUM_RANK = 5
+        WINDOWS_SIZES = np.arange(start=5, stop=11, step=2)
+        RANKS_LIST = np.arange(start=1, stop=7, step=2)
+    print('WINDOWS_SIZES=', WINDOWS_SIZES)
+    print('RANKS_LIST=', RANKS_LIST)
     PFA_THRESHOLD = 0.1
 
     n_r, n_rc, p, T = image.shape
     function_to_compute = compute_several_statistics
 
     # LRCG
-    rank_list = [(i+1) for i in range(MAXIMUM_RANK)]
-    statistic_list = [scale_and_shape_equality_robust_statistic_low_rank for i in range(len(rank_list))]
-    statistic_names = ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in rank_list]
-    args_list = [(0.01, 20, rank, False, 'log') for rank in rank_list]
+    statistic_list = [scale_and_shape_equality_robust_statistic_low_rank for i in range(len(RANKS_LIST))]
+    statistic_names = ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in RANKS_LIST]
+    args_list = [(0.01, 20, rank, False, 'log') for rank in RANKS_LIST]
 
     number_of_statistics = len(statistic_list)
     function_args = [statistic_list, args_list]
@@ -127,6 +128,8 @@ if __name__ == '__main__':
     print("Elpased time: %d s" %(time.time()-t_beginning))
     print('Done')
 
+    print('Computing probability of detection...')
+
     # Computing pd
     λ_pfa_threshold = np.zeros((len(function_args[0]), len(WINDOWS_SIZES)))
     pd_array = np.zeros((len(function_args[0]), len(WINDOWS_SIZES)))
@@ -146,9 +149,10 @@ if __name__ == '__main__':
                 if pfa > PFA_THRESHOLD:
                     pd_array[i_s, i_w] = good_detection.sum() / (ground_truth==1).sum()
                     break
-
     # pd_array is a matrix of shape (nb_rank_tested, nb_windows_sizes_tested)
+    print('Done')
 
+    print('Plotting...')
     # Showing statistics results ROC
     fig = plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
     for i_s, statistic in enumerate(statistic_names):
