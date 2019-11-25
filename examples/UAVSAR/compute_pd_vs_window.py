@@ -131,6 +131,7 @@ if __name__ == '__main__':
     print('Computing probability of detection...')
 
     # Computing pd
+    NUMBER_OF_POINTS = 500
     λ_pfa_threshold = np.zeros((len(function_args[0]), len(WINDOWS_SIZES)))
     pd_array = np.zeros((len(function_args[0]), len(WINDOWS_SIZES)))
 
@@ -140,6 +141,8 @@ if __name__ == '__main__':
             λ_vec = np.sort(vec(results[:,:,i_s,i_w]), axis=0)
             λ_vec = λ_vec[np.logical_not(np.isinf(λ_vec))]
             λ_vec = np.flip(λ_vec, axis=0)
+            indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=NUMBER_OF_POINTS))
+            λ_vec = λ_vec[indices_λ.astype(int)]
 
             # Thresholding and summing for each value
             for i_λ, λ in enumerate(λ_vec):
@@ -147,6 +150,7 @@ if __name__ == '__main__':
                 false_alarms = (results[:,:,i_s,i_w] >= λ) * np.logical_not(ground_truth)
                 pfa = false_alarms.sum() / (ground_truth==0).sum()
                 if pfa > PFA_THRESHOLD:
+                    print('window size=', WINDOWS_SIZES[i_w], 'statistic_names:', statistic_names[i_s], 'pfa=', pfa)
                     pd_array[i_s, i_w] = good_detection.sum() / (ground_truth==1).sum()
                     break
     # pd_array is a matrix of shape (nb_rank_tested, nb_windows_sizes_tested)
