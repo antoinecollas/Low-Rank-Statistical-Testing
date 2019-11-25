@@ -62,15 +62,13 @@ if __name__ == '__main__':
     PATH = 'data/UAVSAR/'
     FULL_TIME_SERIES = False # if true: use the full time series, else: use only the first and last images of the time series
 
-    image, ground_truth_original, X, Y = load_UAVSAR(PATH, DEBUG, FULL_TIME_SERIES)
+    image, _, X, Y = load_UAVSAR(PATH, DEBUG, FULL_TIME_SERIES)
 
     # Parameters
     n_r, n_rc, p, T = image.shape
     windows_mask = np.ones((5,5))
     m_r, m_c = windows_mask.shape
     function_to_compute = compute_several_statistics
-
-    ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
 
     # AIC rule rank over: image 1, image 2, time series (image 1 and 2)
     statistic_list = [rank_estimation_reshape, rank_estimation_reshape]
