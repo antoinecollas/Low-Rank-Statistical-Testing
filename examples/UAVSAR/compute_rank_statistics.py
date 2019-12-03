@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     # AIC rule rank over: image 1, image 2, time series (image 1 and 2)
     statistic_list = [rank_estimation_reshape, rank_estimation_reshape]
-    statistic_names = [r'Rank time series AIC', r'Rank time series BIC']
+    statistic_names = [r'AIC', r'BIC']
     args_list = [('AIC'), ('BIC')]
 
     number_of_statistics = len(statistic_list)
@@ -112,8 +112,10 @@ if __name__ == '__main__':
 
     for i_s, statistic in enumerate(statistic_names):
         plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
-        plt.hist(results[:,:,i_s].reshape((-1)))
-        plt.ylabel('Number of values')
+        temp = results[:,:,i_s].reshape((-1))
+        bins = np.arange(1, temp.max()+1) - 0.5
+        plt.hist(temp, bins=bins, density=True)
+        plt.xticks(bins + 0.5)
         plt.title(statistic)
     
     plt.show()
