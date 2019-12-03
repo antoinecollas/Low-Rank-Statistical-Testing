@@ -229,6 +229,10 @@ if __name__ == '__main__':
     # statistic_names = ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in rank_list]
     # args_list = [(0.01, 20, rank, False, 'log') for rank in rank_list]
 
+    if not (len(statistic_list)==len(statistic_names)==len(args_list)):
+        print('ERROR')
+        sys.exit(1)
+
     number_of_statistics = len(statistic_list)
     function_args = [statistic_list, args_list]
 
