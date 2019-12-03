@@ -218,7 +218,7 @@ def LR_CM_equality_test(𝐗, args):
                 * N = number of Samples
                 * T = Number of groups of samples
             * args = (R, σ2, scale) with
-                * R = rank (put 0 for adaptive estimation)
+                * R = rank (put AIC or BIC for adaptive estimation)
                 * σ2 assumed known (boolean) = if true we estimate σ2 at the beginning, 
                 else it is taken as the mean of p-R lowest eigenvalues when needed.
                 * scale = 'linear' or 'log'
@@ -231,8 +231,8 @@ def LR_CM_equality_test(𝐗, args):
     R, σ2, scale = args
 
     # 2) Estimate R and σ2 if needed
-    if not R:
-        R = rank_estimation(𝐗.reshape((p, N*T)))
+    if not (isinstance(R, int)) :
+        R = rank_estimation(𝐗.reshape((p, N*T)), R)
     if σ2:
         σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
     else:
@@ -285,8 +285,8 @@ def LR_Plug_in_CM_equality_test(𝐗, args):
     R, σ2, scale = args
 
     # 2) Estimate R and σ2 if needed
-    if not R:
-        R = rank_estimation(𝐗.reshape((p, N*T)))
+    if not (isinstance(R, int)) :
+        R = rank_estimation(𝐗.reshape((p, N*T)), R)
     if σ2:
         σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
     else:
@@ -414,7 +414,7 @@ def scale_and_shape_equality_robust_statistic_low_rank(𝐗, args):
             * args = (tol, iter_max, R, σ2, scale)
                 * tol = tol for tyler estimation
                 * iter_max = maximum number of iterations for tyler estimation
-                * R = rank (put 0 for adaptive estimation)
+                * R = rank (put AIC or BIC for adaptive estimation)
                 * σ2 assumed known (boolean) = if true we estimate σ2 at the beginning, 
                 else it is taken as the mean of p-R lowest eigenvalues when needed.
                 * scale = 'linear' or 'log'
@@ -426,8 +426,8 @@ def scale_and_shape_equality_robust_statistic_low_rank(𝐗, args):
     (p, N, T) = 𝐗.shape
 
     # Estimate R and σ2 if needed
-    if not R:
-        R = rank_estimation(𝐗.reshape((p, N*T)))
+    if not (isinstance(R, int)) :
+        R = rank_estimation(𝐗.reshape((p, N*T)), R)
     if σ2:
         σ2 = σ2_estimation(𝐗.reshape((p,N*T)), R)
     else:
