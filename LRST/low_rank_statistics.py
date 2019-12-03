@@ -92,12 +92,10 @@ def information_criterion(s):
     numerator = np.zeros(len(k))
     for idx in k:
         power = 1/(p-idx-1)
-        temp = 1
-        for idx2 in range(idx,p):
-            temp = temp*(s[idx2]**power)
+        temp = np.prod(s[idx:p]**power)
         numerator[idx] = temp
     denominator = np.cumsum(s[::-1])[1:][::-1]
-    ic = np.log(l*numerator/denominator)
+    ic = -np.log(l*numerator/denominator)
     return ic
 
 def AIC_criterion(s, n):
