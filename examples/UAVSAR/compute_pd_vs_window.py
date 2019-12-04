@@ -20,6 +20,9 @@
 ##############################################################################
 import os, sys, time
 
+# The code is already multi threaded so we block OpenBLAS multi thread.
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+
 # import path of root repo
 current_dir = os.path.dirname(os.path.abspath(__file__))
 temp = os.path.dirname(os.path.dirname(current_dir))
@@ -59,8 +62,8 @@ if __name__ == '__main__':
     # These two variables serves to split the original image into sub-images to be treated in parallel
     # In general the optimal parameters are obtained for 
     # number_of_threads_rows*number_of_threads_columns = number of cores on the machine
-    number_of_threads_rows = 6
-    number_of_threads_columns = 8
+    number_of_threads_rows = 4
+    number_of_threads_columns = 4
     if os.cpu_count()!=(number_of_threads_rows*number_of_threads_columns):
         print('WARNING: not all cpu are used')
 
