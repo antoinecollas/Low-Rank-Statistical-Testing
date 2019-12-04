@@ -232,6 +232,18 @@ if __name__ == '__main__':
     # statistic_names = ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in rank_list]
     # args_list = [(0.01, 20, rank, False, 'log') for rank in rank_list]
 
+    # Test LRG with AIC/BIC
+    # rank_list = [1, 3, 5, 'AIC', 'BIC']
+    # statistic_list = [covariance_equality_glrt_gaussian_statistic] + [LR_CM_equality_test for i in range(len(rank_list))]
+    # statistic_names = ['$\hat{\Lambda}_{\mathrm{G}}$'] + ['$\hat{\Lambda}_{\mathrm{LRG, R='+str(rank)+'}}$' for rank in rank_list]
+    # args_list = ['log'] + [(rank, False, 'log') for rank in rank_list]
+
+    # Test LRCG with AIC/BIC
+    # rank_list = [1, 3, 5, 'AIC', 'BIC']
+    # statistic_list = [scale_and_shape_equality_robust_statistic] + [scale_and_shape_equality_robust_statistic_low_rank for i in range(len(rank_list))]
+    # statistic_names = ['$\hat{\Lambda}_{\mathrm{CG}}$'] + ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in rank_list]
+    # args_list = [(0.01, 20, 'log')] + [(0.01, 20, rank, False, 'log') for rank in rank_list]
+
     if not (len(statistic_list)==len(statistic_names)==len(args_list)):
         print('ERROR')
         sys.exit(1)
