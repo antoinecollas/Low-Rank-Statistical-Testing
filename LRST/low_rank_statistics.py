@@ -133,6 +133,26 @@ def BIC_criterion(s, n):
     criterion = 2*n*l*ic+k*(l+p)*np.log(n)
     return criterion
 
+def SCM_rank_criterion(𝐗, method):
+    """ Compute the SCM of 𝐗 and the AIC/BIC criteria for rank estimation
+    ----------------------------------------------
+    Inputs:
+    --------
+        * s = a (p) numpy array of eigenvalues of SCM
+        * n = number of samples used for computing the SCM
+    Outputs:
+    ---------
+        * the criterion """
+    (_, N) = 𝐗.shape
+    𝚺 = SCM(X)
+    u, s, vh = np.linalg.svd(𝚺)
+    if method == 'AIC':
+        criterion = AIC_criterion(s, N)
+    elif method == 'BIC':
+        criterion = BIC_criterion(s, N)
+    else:
+        raise
+    return criterion
 
 def rank_estimation(𝐗, method='AIC'):
     """ order selection using AIC or BIC methods
@@ -145,15 +165,7 @@ def rank_estimation(𝐗, method='AIC'):
         Outputs:
         ---------
             * the Rank """
-    (_, N) = 𝐗.shape
-    𝚺 = SCM(X)
-    u, s, vh = np.linalg.svd(𝚺)
-    if method == 'AIC':
-        criterion = AIC_criterion(s, N)
-    elif method == 'BIC':
-        criterion = BIC_criterion(s, N)
-    else:
-        raise
+    criterion = SCM_rank_criterion(𝐗, method)
     rank = np.argmin(criterion) + 1
     return rank
 
