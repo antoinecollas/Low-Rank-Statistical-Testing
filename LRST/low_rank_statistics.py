@@ -19,10 +19,11 @@
 ##############################################################################
 import numpy as np
 import scipy as sp
+from sklearn.decomposition._pca import _assess_dimension_
+
 import warnings
+
 from LRST.generic_functions import *
-
-
 
 
 # ----------------------------------------------------------------------------
@@ -92,7 +93,7 @@ def information_criterion(s):
     numerator = np.zeros(len(k))
     for idx in k:
         power = 1/(p-idx-1)
-        temp = np.prod(s[idx:p]**power)
+        temp = np.prod(s[idx:]**power)
         numerator[idx] = temp
     denominator = np.cumsum(s[::-1])[1:][::-1]
     ic = -np.log(l*numerator/denominator)
@@ -133,8 +134,8 @@ def BIC_criterion(s, n):
     criterion = 2*n*l*ic+k*(l+p)*np.log(n)
     return criterion
 
-def SCM_rank_criterion(𝐗, method):
-    """ Compute the SCM of 𝐗 and the AIC/BIC criteria for rank estimation
+def Minka_criterion(s, n):
+    """ Minka criterion for order selection from Minka 2000 "Automatic choice of dimensionality for PCA"
     ----------------------------------------------
     Inputs:
     --------
@@ -143,13 +144,33 @@ def SCM_rank_criterion(𝐗, method):
     Outputs:
     ---------
         * the criterion """
-    (_, N) = 𝐗.shape
+    p = len(s)
+    criterion = np.empty(p)
+    for rank in range(p):
+        criterion[rank] = -_assess_dimension_(s, rank, n, p)
+    return criterion
+
+def SCM_rank_criterion(𝐗, method):
+    """ Compute the SCM of 𝐗 and the AIC/BIC criteria for rank estimation
+    ----------------------------------------------
+    Inputs:
+    --------
+        * 𝐗 = a (p, N) numpy array with:
+            * p = dimension of vectors
+            * N = number of Samples
+        * method = 'AIC'/'BIC'/'Minka'
+    Outputs:
+    ---------
+        * the criterion """
+    (p, N) = 𝐗.shape
     𝚺 = SCM(X)
     u, s, vh = np.linalg.svd(𝚺)
     if method == 'AIC':
         criterion = AIC_criterion(s, N)
     elif method == 'BIC':
         criterion = BIC_criterion(s, N)
+    elif method == 'Minka':
+        criterion = Minka_criterion(s, N)
     else:
         raise
     return criterion
