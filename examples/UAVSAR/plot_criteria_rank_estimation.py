@@ -65,6 +65,8 @@ if __name__ == '__main__':
     m_r, m_c = windows_mask.shape
     N = m_r*m_c
 
+    METHODS = ['AIC', 'BIC', 'AICc']
+
     while True:
         i_r = random.choice(list(range(int(m_r/2), n_r-int(m_r/2))))
         i_c = random.choice(list(range(int(m_c/2), n_c-int(m_c/2))))
@@ -75,19 +77,12 @@ if __name__ == '__main__':
         local_data = local_data.reshape((p,N*T))
 
         # Computing the function over the local data
-        criterion_AIC = SCM_rank_criterion(local_data, method='AIC')
-        criterion_BIC = SCM_rank_criterion(local_data, method='BIC')
-        # criterion_Minka = SCM_rank_criterion(local_data, method='Minka')
-        # criterion_BIC_Minka = SCM_rank_criterion(local_data, method='BIC_Minka')
+        for method in METHODS:
+          criterion = SCM_rank_criterion(local_data, method=method)
+          ranks = np.arange(criterion.shape[0])+1
+          plt.plot(ranks, criterion, label=method)
+          idx_min = criterion.argmin()
+          plt.plot(ranks[idx_min],criterion[idx_min],'o')
 
-        ranks = np.arange(criterion_AIC.shape[0])+1
-        plt.plot(ranks, criterion_AIC, label='AIC')
-        plt.plot(ranks, criterion_BIC, label='BIC')
-        idx_min = criterion_AIC.argmin()
-        plt.plot(ranks[idx_min],criterion_AIC[idx_min],'o')
-        idx_min = criterion_BIC.argmin()
-        plt.plot(ranks[idx_min],criterion_BIC[idx_min],'x')
-        # plt.plot(ranks, criterion_Minka[:-1], label='Minka')
-        # plt.plot(ranks, criterion_BIC_Minka, label='BIC_Minka')
         plt.legend()
         plt.show()

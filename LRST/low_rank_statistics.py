@@ -17,6 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##############################################################################
+import sys
 import numpy as np
 import scipy as sp
 from sklearn.decomposition._pca import _assess_dimension_
@@ -114,6 +115,22 @@ def AIC_criterion(s, n):
     criterion = n*(p-k)*ic+k*(2*p-k)
     return criterion
     
+def AICc_criterion(s, n):
+    """ AICc criterion for order selection
+    ----------------------------------------------
+    Inputs:
+    --------
+        * s = a (p) numpy array of eigenvalues of SCM
+        * n = number of samples used for computing the SCM
+    Outputs:
+    ---------
+        * the criterion """
+    p = len(s)
+    k = np.arange(1,p)
+    ic = information_criterion(s)
+    nb_param = k*(2*p-k) + 1
+    criterion = n*(p-k)*ic + nb_param + (nb_param**2+nb_param)/(n-nb_param-1)
+    return criterion
 
 def BIC_criterion(s, n):
     """ BIC criterion for order selection
@@ -184,6 +201,8 @@ def SCM_rank_criterion(𝐗, method):
     u, s, vh = np.linalg.svd(𝚺)
     if method == 'AIC':
         criterion = AIC_criterion(s, N)
+    elif method == 'AICc':
+        criterion = AICc_criterion(s, N)
     elif method == 'BIC':
         criterion = BIC_criterion(s, N)
     elif method == 'BIC_Minka':
@@ -191,7 +210,8 @@ def SCM_rank_criterion(𝐗, method):
     elif method == 'Minka':
         criterion = Minka_criterion(s, N)
     else:
-        raise
+        print('Method', method, 'unknown...')
+        sys.exit(1)
     return criterion
 
 def rank_estimation(𝐗, method='AIC'):
