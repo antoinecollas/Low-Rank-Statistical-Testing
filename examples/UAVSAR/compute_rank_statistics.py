@@ -116,7 +116,7 @@ if __name__ == '__main__':
     for i_s, statistic in enumerate(statistic_names):
         plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
         temp = results[:,:,i_s].reshape((-1))
-        bins = np.arange(1, temp.max()+1) - 0.5
+        bins = np.arange(1, temp.max()+2) - 0.5
         plt.hist(temp, bins=bins, density=True)
         plt.xticks(bins + 0.5)
         plt.title(statistic)

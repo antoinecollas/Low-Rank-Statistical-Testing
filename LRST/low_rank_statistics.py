@@ -88,15 +88,14 @@ def information_criterion(s):
     ---------
         * the information criterion """
     p = len(s)
-    k = np.arange(p-1)
-    l = p - k
-    numerator = np.zeros(len(k))
+    k = np.arange(1, p)
+    numerator = np.empty(len(k))
     for idx in k:
-        power = 1/(p-idx-1)
-        temp = np.prod(s[idx:]**power)
-        numerator[idx] = temp
-    denominator = np.cumsum(s[::-1])[1:][::-1]
-    ic = -np.log(l*numerator/denominator)
+        power = 1/(p-idx)
+        temp = np.prod(s[idx:])**power
+        numerator[idx-1] = temp
+    denominator = np.cumsum(s[1:][::-1])[::-1]
+    ic = -np.log((p-k)*numerator/denominator)
     return ic
 
 def AIC_criterion(s, n):
@@ -110,10 +109,9 @@ def AIC_criterion(s, n):
     ---------
         * the criterion """
     p = len(s)
-    k = np.arange(p-1)
-    l = p - k
+    k = np.arange(1,p)
     ic = information_criterion(s)
-    criterion = n*l*ic+k*(l+p)
+    criterion = n*(p-k)*ic+k*(2*p-k)
     return criterion
     
 
@@ -128,10 +126,9 @@ def BIC_criterion(s, n):
     ---------
         * the criterion """
     p = len(s)
-    k = np.arange(p-1)
-    l = p - k
+    k = np.arange(1,p)
     ic = information_criterion(s)
-    criterion = 2*n*l*ic+k*(l+p)*np.log(n)
+    criterion = 2*n*(p-k)*ic+k*(2*p-k)*np.log(n)
     return criterion
 
 def BIC_minka_criterion(s, n):
