@@ -77,9 +77,11 @@ if __name__ == '__main__':
         # Computing the function over the local data
         criterion_AIC = SCM_rank_criterion(local_data, method='AIC')
         criterion_BIC = SCM_rank_criterion(local_data, method='BIC')
+        criterion_Minka = SCM_rank_criterion(local_data, method='Minka')
 
         ranks = np.arange(criterion_AIC.shape[0])+1
         plt.plot(ranks, criterion_AIC, label='AIC')
         plt.plot(ranks, criterion_BIC, label='BIC')
+        plt.plot(ranks, criterion_Minka[:-1], label='Minka')
         plt.legend()
         plt.show()
