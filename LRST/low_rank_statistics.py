@@ -94,7 +94,6 @@ def information_criterion(s):
     for idx in k:
         power = 1/(p-idx-1)
         temp = np.prod(s[idx:]**power)
-        # temp = np.prod(s[:idx]**power)
         numerator[idx] = temp
     denominator = np.cumsum(s[::-1])[1:][::-1]
     ic = -np.log(l*numerator/denominator)
@@ -135,6 +134,26 @@ def BIC_criterion(s, n):
     criterion = 2*n*l*ic+k*(l+p)*np.log(n)
     return criterion
 
+def BIC_minka_criterion(s, n):
+    """ BIC criterion for order selection from Minka 2000 "Automatic choice of dimensionality for PCA"
+    ----------------------------------------------
+    Inputs:
+    --------
+        * s = a (p) numpy array of eigenvalues of SCM
+        * n = number of samples used for computing the SCM
+    Outputs:
+    ---------
+        * the criterion """
+    p = len(s)
+    k = np.arange(1, p)
+    criterion = np.empty(p-1)
+    for idx in k:
+        m = p*(p-1)/2-(p-idx)*(p-idx-1)/2
+        temp0 = (n/2) * np.sum(np.log(s[:idx]))
+        temp1 = (n*(p-idx)/2) * np.log(np.sum(s[idx:])/(p-idx))
+        criterion[idx-1] = temp0 + temp1 + ((m+idx)/2)*np.log(n)
+    return criterion
+
 def Minka_criterion(s, n):
     """ Minka criterion for order selection from Minka 2000 "Automatic choice of dimensionality for PCA"
     ----------------------------------------------
@@ -170,6 +189,8 @@ def SCM_rank_criterion(𝐗, method):
         criterion = AIC_criterion(s, N)
     elif method == 'BIC':
         criterion = BIC_criterion(s, N)
+    elif method == 'BIC_Minka':
+        criterion = BIC_minka_criterion(s, N)
     elif method == 'Minka':
         criterion = Minka_criterion(s, N)
     else:
