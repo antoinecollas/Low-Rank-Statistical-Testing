@@ -94,6 +94,7 @@ def information_criterion(s):
     for idx in k:
         power = 1/(p-idx-1)
         temp = np.prod(s[idx:]**power)
+        # temp = np.prod(s[:idx]**power)
         numerator[idx] = temp
     denominator = np.cumsum(s[::-1])[1:][::-1]
     ic = -np.log(l*numerator/denominator)
