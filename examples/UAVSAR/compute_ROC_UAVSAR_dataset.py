@@ -84,16 +84,26 @@ def download_uavsar_cd_dataset(path='./data/'):
             print("File %s not found, downloading it" % file_url.split('/')[-1])
             wget.download(url=file_url, out=path+file_url.split('/')[-1])
 
-def load_UAVSAR(path, debug, full_time_series):
+def load_UAVSAR(path, debug, full_time_series, scene_number=1):
     """ Function which loads UAVSAR time series with its ground truth. It also applies a wavelet decomposition.
 
     Inputs:
         * path = base path to find the data
         * debug = if true, only a a small square of the time series is loaded
         * full_time_series = if true, loads the full time series, otherwhise loads only first and last images
+        * scene_number = 1 or 2, 2 different scenes are available
     Outputs:
         * image = the time series of shape (rows, columns, p, T)
         * ground truth the time series (rows, columns)"""
+
+    if scene_number==1:
+        crop_indexes = [28891,31251,2891,3491]
+    elif scene_number==2:
+        crop_indexes = [25601,27901,3236,3836]
+    else:
+        print("ERROR in number of scene....")
+        import sys
+        sys.exit(1)
 
     # Downloading data if needed
     download_uavsar_cd_dataset(path=path)
@@ -108,7 +118,7 @@ def load_UAVSAR(path, debug, full_time_series):
     print( ' (•ㅅ•) || ')
     print( ' / 　 づ')
     data_class = uavsar_slc_stack_1x1(path)
-    data_class.read_data(time_series=full_time_series, polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=[28891,31251,2891,3491])
+    data_class.read_data(time_series=full_time_series, polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=crop_indexes)
     if debug:
         n_r, n_rc, _, _ = data_class.data.shape
         new_size_image = 200
@@ -151,7 +161,8 @@ def load_UAVSAR(path, debug, full_time_series):
     image_temp = None
     print('Done')
 
-    ground_truth_original = np.load('./data/ground_truth_uavsar_scene1.npy')
+    path_ground_truth = './data/ground_truth_uavsar_scene'+str(scene_number)+'.npy'
+    ground_truth_original = np.load(path_ground_truth)
     if debug:
         ground_truth_original = ground_truth_original[(n_r//2)-(new_size_image//2):(n_r//2)+(new_size_image//2), (n_rc//2)-(new_size_image//2):(n_rc//2)+(new_size_image//2)]
 
@@ -179,8 +190,9 @@ if __name__ == '__main__':
     DEBUG = False
     PATH = 'data/UAVSAR/'
     FULL_TIME_SERIES = False # if true: use the full time series, else: use only the first and last images of the time series
+    SCENE_NUMBER = 2
 
-    image, ground_truth_original, X, Y = load_UAVSAR(PATH, DEBUG, FULL_TIME_SERIES)
+    image, ground_truth_original, X, Y = load_UAVSAR(PATH, DEBUG, FULL_TIME_SERIES, SCENE_NUMBER)
 
     # Parameters
     n_r, n_rc, p, T = image.shape
