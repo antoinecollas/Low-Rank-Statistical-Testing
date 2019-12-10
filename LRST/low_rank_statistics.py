@@ -129,7 +129,7 @@ def AICc_criterion(s, n):
     k = np.arange(1,p)
     ic = information_criterion(s)
     nb_param = k*(2*p-k) + 1
-    criterion = n*(p-k)*ic + nb_param + (nb_param**2+nb_param)/(n-nb_param-1)
+    criterion = n*(p-k)*ic + nb_param + (nb_param**2+nb_param)/((n*p)-nb_param-1)
     return criterion
 
 def BIC_criterion(s, n):
