@@ -74,10 +74,9 @@ if __name__ == '__main__':
     function_to_compute = compute_several_statistics
 
     # AIC rule rank over: image 1, image 2, time series (image 1 and 2)
-    statistic_list = [rank_estimation_reshape, rank_estimation_reshape]
-    statistic_names = [r'AIC', r'BIC']
-    args_list = [('AIC'), ('BIC')]
-
+    statistic_names = [r'EDC']
+    statistic_list = [rank_estimation_reshape for i in range(len(statistic_names))]
+    args_list = [(stat) for stat in statistic_names]
     number_of_statistics = len(statistic_list)
     function_args = [statistic_list, args_list]
 
