@@ -184,6 +184,22 @@ def Minka_criterion(s, n):
         criterion[rank] = -_assess_dimension_(s, rank, n, p)
     return criterion
 
+def EDC_criterion(s, n):
+    """ EDC criterion for order selection
+    ----------------------------------------------
+    Inputs:
+    --------
+        * s = a (p) numpy array of eigenvalues of SCM
+        * n = number of samples used for computing the SCM
+    Outputs:
+    ---------
+        * the criterion """
+    p = len(s)
+    k = np.arange(1,p)
+    ic = information_criterion(s)
+    criterion = 2*n*(p-k)*ic+k*(2*p-k)*2*np.sqrt(n*np.log(np.log(n)))
+    return criterion
+
 def SCM_rank_criterion(𝐗, method):
     """ Compute the SCM of 𝐗 and the AIC/BIC criteria for rank estimation
     ----------------------------------------------
@@ -209,6 +225,8 @@ def SCM_rank_criterion(𝐗, method):
         criterion = BIC_minka_criterion(s, N)
     elif method == 'Minka':
         criterion = Minka_criterion(s, N)
+    elif method == 'EDC':
+        criterion = EDC_criterion(s, N)
     else:
         print('Method', method, 'unknown...')
         sys.exit(1)
