@@ -145,7 +145,7 @@ def BIC_criterion(s, n):
     p = len(s)
     k = np.arange(1,p)
     ic = information_criterion(s)
-    criterion = 2*n*(p-k)*ic+k*(2*p-k)*np.log(n)
+    criterion = n*(p-k)*ic+k*(2*p-k)*0.5*np.log(n)
     return criterion
 
 def BIC_minka_criterion(s, n):
@@ -197,7 +197,7 @@ def EDC_criterion(s, n):
     p = len(s)
     k = np.arange(1,p)
     ic = information_criterion(s)
-    criterion = 2*n*(p-k)*ic+k*(2*p-k)*2*np.sqrt(n*np.log(np.log(n)))
+    criterion = n*(p-k)*ic+k*(2*p-k)*np.sqrt(n*np.log(np.log(n)))
     return criterion
 
 def SCM_rank_criterion(𝐗, method):

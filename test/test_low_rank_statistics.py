@@ -7,7 +7,7 @@ sys.path.insert(1, temp)
 
 import numpy as np
 import pytest
-from LRST.low_rank_statistics import information_criterion, AIC_criterion, BIC_criterion
+from LRST.low_rank_statistics import information_criterion, AIC_criterion, BIC_criterion, EDC_criterion
 
 def test_information_criterion():
     s = np.array([2, 0.5, 0.1])
@@ -22,4 +22,9 @@ def test_AIC_rank_estimation():
 def test_BIC_rank_estimation():
     s = np.array([2, 0.5, 0.1])
     criterion = BIC_criterion(s, n=25)
-    assert criterion == pytest.approx((45.49, 25.75), rel=1e-1)
+    assert criterion == pytest.approx((22.75, 12.88), rel=1e-1)
+
+def test_EDC_rank_estimation():
+    s = np.array([2, 0.5, 0.1])
+    criterion = EDC_criterion(s, n=25)
+    assert criterion == pytest.approx((41.73, 43.25), rel=1e-1)
