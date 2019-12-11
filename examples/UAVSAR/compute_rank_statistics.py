@@ -64,8 +64,9 @@ if __name__ == '__main__':
     DEBUG = False
     PATH = 'data/UAVSAR/'
     FULL_TIME_SERIES = False # if true: use the full time series, else: use only the first and last images of the time series
+    SCENE_NUMBER = 1
 
-    image, _, X, Y = load_UAVSAR(PATH, DEBUG, FULL_TIME_SERIES)
+    image, _, X, Y = load_UAVSAR(PATH, DEBUG, FULL_TIME_SERIES, SCENE_NUMBER)
 
     # Parameters
     n_r, n_rc, p, T = image.shape
