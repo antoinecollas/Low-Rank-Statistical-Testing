@@ -106,6 +106,15 @@ if __name__ == '__main__':
     number_of_statistics = len(statistic_list)
     function_args = [statistic_list, args_list]
 
+    rank_values = np.unique(ranks)
+    number_of_points = 1000
+    for rank in rank_values:
+        if (ranks==rank).sum() < 10*number_of_points:
+            print('rank:', rank)
+            print('(ranks==rank).sum():', (ranks==rank).sum())
+            ranks[ranks==rank] = 3
+    rank_values = np.unique(ranks)
+
     print( '|￣￣￣￣￣￣￣￣|')
     print( '|   COMPUTING   |') 
     print( '|   in progress |')
@@ -118,9 +127,6 @@ if __name__ == '__main__':
     print("Elpased time: %d s" %(time.time()-t_beginning))
 
     # Computing ROC curves
-    rank_values = np.unique(ranks)
-    print(rank_values)
-    number_of_points = 1000
     pfa_array = np.zeros((number_of_points, len(function_args[0])))
     pd_array = np.zeros((number_of_points, len(function_args[0])))
 
