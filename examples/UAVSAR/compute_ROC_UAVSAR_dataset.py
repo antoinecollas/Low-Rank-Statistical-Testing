@@ -203,9 +203,9 @@ if __name__ == '__main__':
     ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
 
     # Gaussian
-    statistic_list = [covariance_equality_glrt_gaussian_statistic]
-    statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$']
-    args_list = ['log']
+    # statistic_list = [covariance_equality_glrt_gaussian_statistic]
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$']
+    # args_list = ['log']
 
     # Low rank Gaussian
     # statistic_list = [LR_CM_equality_test, LR_CM_equality_test, LR_CM_equality_test]
@@ -245,16 +245,32 @@ if __name__ == '__main__':
     # args_list = [(0.01, 20, rank, False, 'log') for rank in rank_list]
 
     # Test LRG with AIC/BIC
-    # rank_list = [1, 3, 5, 'AIC', 'BIC']
+    # rank_list = [1, 3, 5, 'BIC', 'EDC']
     # statistic_list = [covariance_equality_glrt_gaussian_statistic] + [LR_CM_equality_test for i in range(len(rank_list))]
     # statistic_names = ['$\hat{\Lambda}_{\mathrm{G}}$'] + ['$\hat{\Lambda}_{\mathrm{LRG, R='+str(rank)+'}}$' for rank in rank_list]
     # args_list = ['log'] + [(rank, False, 'log') for rank in rank_list]
 
     # Test LRCG with AIC/BIC
-    # rank_list = [1, 3, 5, 'AIC', 'BIC']
+    # rank_list = [1, 3, 5, 'BIC', 'EDC']
     # statistic_list = [scale_and_shape_equality_robust_statistic] + [scale_and_shape_equality_robust_statistic_low_rank for i in range(len(rank_list))]
     # statistic_names = ['$\hat{\Lambda}_{\mathrm{CG}}$'] + ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in rank_list]
     # args_list = [(0.01, 20, 'log')] + [(0.01, 20, rank, False, 'log') for rank in rank_list]
+
+    # Simu paper
+    ranks = [1, 3, 'EDC']
+    statistic_list = [covariance_equality_glrt_gaussian_statistic, scale_and_shape_equality_robust_statistic]
+    statistic_list += [LR_CM_equality_test]*len(ranks)
+    statistic_list += [scale_and_shape_equality_robust_statistic_low_rank]*len(ranks)
+    statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$']
+    for rank in ranks:
+        statistic_names += [r'$\hat{\Lambda}_{\mathrm{LRG, R='+str(rank)+'}}$']
+    for rank in ranks:
+        statistic_names += [r'$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$']
+    args_list = ['log', (0.01, 20, 'log')]
+    for rank in ranks:
+        args_list += [(rank, False, 'log')]
+    for rank in ranks:
+        args_list += [(0.01, 20, rank, False, 'log')]
 
     if not (len(statistic_list)==len(statistic_names)==len(args_list)):
         print('ERROR')

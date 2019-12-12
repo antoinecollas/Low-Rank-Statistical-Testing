@@ -65,7 +65,7 @@ if __name__ == '__main__':
     m_r, m_c = windows_mask.shape
     N = m_r*m_c
 
-    METHODS = ['AIC', 'BIC', 'AICc']
+    METHODS = ['AIC', 'BIC', 'AICc', 'EDC']
 
     while True:
         i_r = random.choice(list(range(int(m_r/2), n_r-int(m_r/2))))
