@@ -173,6 +173,10 @@ if __name__ == '__main__':
             relative_error = np.abs(pfa-pfa_array_ranks[rank,j])/pfa
             if relative_error>=0.05:
                 print('High relative error on Pfa:', relative_error)
+                print('rank:', rank)
+                print('pfa:', pfa)
+                print('pfa_array_ranks[rank, j]:', pfa_array_ranks[rank, j])
+                print()
             nb_points_rank = (ranks == rank).sum()
             pd += nb_points_rank*pd_array_ranks[rank, j]
         pfa_array[i, 1] = pfa
