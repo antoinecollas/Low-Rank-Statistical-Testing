@@ -208,9 +208,9 @@ if __name__ == '__main__':
     # args_list = ['log']
 
     # Low rank Gaussian
-    # statistic_list = [LR_CM_equality_test, LR_CM_equality_test, LR_CM_equality_test]
-    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{LRG}},{\mathrm{AIC}}$', r'$\hat{\Lambda}_{\mathrm{LRG}},{\mathrm{Rank=1}}$', r'$\hat{\Lambda}_{\mathrm{LRG}},{\mathrm{Rank=3}}$']
-    # args_list = [(None, False, 'log'), (1, False, 'log'), (3, False, 'log')]
+    # statistic_list = [LR_CM_equality_test]
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{LRG}},{\mathrm{Rank=1}}$']
+    # args_list = [(1, False, 'log')]
 
     # Compound Gaussian
     # statistic_list = [scale_and_shape_equality_robust_statistic]
@@ -244,20 +244,8 @@ if __name__ == '__main__':
     # statistic_names = ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in rank_list]
     # args_list = [(0.01, 20, rank, False, 'log') for rank in rank_list]
 
-    # Test LRG with AIC/BIC
-    # rank_list = [1, 3, 5, 'BIC', 'EDC']
-    # statistic_list = [covariance_equality_glrt_gaussian_statistic] + [LR_CM_equality_test for i in range(len(rank_list))]
-    # statistic_names = ['$\hat{\Lambda}_{\mathrm{G}}$'] + ['$\hat{\Lambda}_{\mathrm{LRG, R='+str(rank)+'}}$' for rank in rank_list]
-    # args_list = ['log'] + [(rank, False, 'log') for rank in rank_list]
-
-    # Test LRCG with AIC/BIC
-    # rank_list = [1, 3, 5, 'BIC', 'EDC']
-    # statistic_list = [scale_and_shape_equality_robust_statistic] + [scale_and_shape_equality_robust_statistic_low_rank for i in range(len(rank_list))]
-    # statistic_names = ['$\hat{\Lambda}_{\mathrm{CG}}$'] + ['$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$' for rank in rank_list]
-    # args_list = [(0.01, 20, 'log')] + [(0.01, 20, rank, False, 'log') for rank in rank_list]
-
     # Simu paper
-    ranks = [1, 3, 'EDC']
+    ranks = [1, 3]
     statistic_list = [covariance_equality_glrt_gaussian_statistic, scale_and_shape_equality_robust_statistic]
     statistic_list += [LR_CM_equality_test]*len(ranks)
     statistic_list += [scale_and_shape_equality_robust_statistic_low_rank]*len(ranks)

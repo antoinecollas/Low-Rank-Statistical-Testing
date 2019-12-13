@@ -77,8 +77,9 @@ if __name__ == '__main__':
     ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
 
     # Rank estimation
+    RANK_ESTIMATION_METHOD = 'EDC_thresholded_4'
     statistic_list = [rank_estimation_reshape]
-    args_list = [('EDC_thresholded_4')]
+    args_list = [(RANK_ESTIMATION_METHOD)]
     function_args = [statistic_list, args_list]
 
     print( '|￣￣￣￣￣￣￣￣|')
@@ -94,8 +95,8 @@ if __name__ == '__main__':
 
     # Test with EDC
     statistic_list = [LR_CM_equality_test, LR_CM_equality_test]
-    statistic_names = ['$\hat{\Lambda}_{\mathrm{LRG, R=1}}$', '$\hat{\Lambda}_{\mathrm{LRG, R=EDC}}$']
-    args_list = [(1, False, 'log'), ('EDC_thresholded_4', False, 'log')]
+    statistic_names = ['$\hat{\Lambda}_{\mathrm{LRG, R=1}}$', '$\hat{\Lambda}_{\mathrm{LRG, R='+RANK_ESTIMATION_METHOD+'}}$']
+    args_list = [(1, False, 'log'), (RANK_ESTIMATION_METHOD, False, 'log')]
     function_args = [statistic_list, args_list]
     if not (len(statistic_list)==len(statistic_names)==len(args_list)):
         print('ERROR')
@@ -114,8 +115,7 @@ if __name__ == '__main__':
 
     # Computing ROC curves
     rank_values = np.unique(ranks)
-    nb_thresholds = 1000
-    nb_points = nb_thresholds//10
+    nb_points = 100
     pfa_array = np.zeros((nb_points, len(function_args[0])))
     pd_array = np.zeros((nb_points, len(function_args[0])))
 
@@ -134,10 +134,11 @@ if __name__ == '__main__':
         pd_array[i_λ, 0] = good_detection.sum() / (ground_truth==1).sum()
         pfa_array[i_λ, 0] = false_alarms.sum() / (ground_truth==0).sum()
 
-    pfa_array_ranks = np.zeros((len(ranks), nb_thresholds))
-    pd_array_ranks = np.zeros((len(ranks), nb_thresholds))
+    pfa_array_ranks = np.zeros((len(ranks), nb_points))
+    pd_array_ranks = np.zeros((len(ranks), nb_points))
 
     # Compute ROC curve for low rank model
+    pfa_targets = np.linspace(0, 1, num=nb_points)
     for rank in rank_values:
         mask = (ranks == rank)[:,:,0]
         results_rank = results[:,:,1][mask]
@@ -146,37 +147,41 @@ if __name__ == '__main__':
         # Sorting values of statistic
         λ_vec = np.sort(vec(results_rank), axis=0)
         λ_vec = λ_vec[np.logical_not(np.isinf(λ_vec))]
-        # Selectionning nb_thresholds values from beginning to end
-        indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=nb_thresholds)) # logspace
+        # Selectionning nb_points values from beginning to end
+        indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=nb_points)) # logspace
         λ_vec = np.flip(λ_vec, axis=0)
         λ_vec = λ_vec[indices_λ.astype(int)]
-        # Thresholding and summing for each value
-        for i_λ, λ in enumerate(λ_vec):
-            good_detection = (results_rank >= λ) * ground_truth_rank
-            false_alarms = (results_rank >= λ) * np.logical_not(ground_truth_rank)
-            pd_array_ranks[rank, i_λ] = good_detection.sum() / (ground_truth_rank==1).sum()
-            pfa_array_ranks[rank, i_λ] = false_alarms.sum() / (ground_truth_rank==0).sum()
 
-    pfa_target = np.linspace(1/nb_points, 1, num=nb_points)
-    for i, pfa in enumerate(pfa_target):
-        pd = 0
-        for rank in rank_values:
+        for i, pfa_target in enumerate(pfa_targets):
             j = 0
-            while pfa_array_ranks[rank,j]<pfa:
+            pfa = -1
+            while pfa < pfa_target:
+                λ = λ_vec[j]
+                good_detection = (results_rank >= λ) * ground_truth_rank
+                false_alarms = (results_rank >= λ) * np.logical_not(ground_truth_rank)
+                pd = good_detection.sum() / (ground_truth_rank==1).sum()
+                pfa = false_alarms.sum() / (ground_truth_rank==0).sum()
                 j += 1
-            relative_error = np.abs(pfa-pfa_array_ranks[rank,j])/pfa
+            relative_error = np.abs(pfa_target-pfa)/pfa_target
             if relative_error>=0.05:
                 print('High relative error on Pfa:', relative_error)
                 print('rank:', rank)
                 print('pfa:', pfa)
-                print('pfa_array_ranks[rank, j]:', pfa_array_ranks[rank, j])
+                print('pfa_target:', pfa_target)
                 print()
                 if not DEBUG:
                     sys.exit(1)
+            pfa_array_ranks[rank, i] = pfa
+            pd_array_ranks[rank, i] = pd
+
+    for i, pfa in enumerate(pfa_targets):
+        pd = 0
+        for j, rank in enumerate(rank_values):
             nb_points_rank = (ranks == rank).sum()
-            pd += nb_points_rank*pd_array_ranks[rank, j]
+            pd += nb_points_rank*pd_array_ranks[rank, i]
+        pd = pd/(results.shape[0]*results.shape[1])
         pfa_array[i, 1] = pfa
-        pd_array[i, 1] = pd/(results.shape[0]*results.shape[1])
+        pd_array[i, 1] = pd
 
     # Showing statistics results raw
     for i_s, statistic in enumerate(statistic_names):
