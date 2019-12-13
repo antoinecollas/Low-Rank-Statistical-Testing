@@ -148,7 +148,7 @@ if __name__ == '__main__':
         λ_vec = np.sort(vec(results_rank), axis=0)
         λ_vec = λ_vec[np.logical_not(np.isinf(λ_vec))]
         # Selectionning nb_points values from beginning to end
-        indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=nb_points)) # logspace
+        indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=1000)) # logspace
         λ_vec = np.flip(λ_vec, axis=0)
         λ_vec = λ_vec[indices_λ.astype(int)]
 
