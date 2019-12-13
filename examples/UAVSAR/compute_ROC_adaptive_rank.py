@@ -119,7 +119,7 @@ if __name__ == '__main__':
     pfa_array = np.zeros((nb_points, len(function_args[0])))
     pd_array = np.zeros((nb_points, len(function_args[0])))
 
-    # Compute ROC curve for non adaptative model
+    # Compute ROC curve for non adaptive model
     # Sorting values of statistic
     λ_vec = np.sort(vec(results[:,:,0]), axis=0)
     λ_vec = λ_vec[np.logical_not(np.isinf(λ_vec))]
