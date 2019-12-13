@@ -208,7 +208,7 @@ def SCM_rank_criterion(𝐗, method):
         * 𝐗 = a (p, N) numpy array with:
             * p = dimension of vectors
             * N = number of Samples
-        * method = 'AIC'/'BIC'/'Minka'
+        * method = 'AIC'/'AICc'/'BIC'/'BIC_Minka'/'Minka'/'EDC' and their thresholded versions
     Outputs:
     ---------
         * the criterion """
@@ -243,8 +243,19 @@ def rank_estimation(𝐗, method='AIC'):
         Outputs:
         ---------
             * the Rank """
+    method_split = method.split('_')
+    if (len(method_split)>=4) or (len(method_split)==2) or ((len(method_split)==3) and (method_split[1]!='thresholded')):
+        print('Method', method, 'unknown...')
+        sys.exit(1)
+    method = method_split[0]
+    if len(method_split) == 3:
+        threshold = int(method_split[2])
+    else:
+        threshold = None
     criterion = SCM_rank_criterion(𝐗, method)
     rank = np.argmin(criterion) + 1
+    if (threshold is not None) and (rank>threshold):
+        rank = threshold
     return rank
 
 def rank_estimation_reshape(𝐗, args):

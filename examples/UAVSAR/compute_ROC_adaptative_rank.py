@@ -77,10 +77,8 @@ if __name__ == '__main__':
     ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
 
     # Rank estimation
-    statistic_names = [r'EDC']
-    statistic_list = [rank_estimation_reshape for i in range(len(statistic_names))]
-    args_list = [(stat) for stat in statistic_names]
-    number_of_statistics = len(statistic_list)
+    statistic_list = [rank_estimation_reshape]
+    args_list = [('EDC_thresholded_4')]
     function_args = [statistic_list, args_list]
 
     print( '|￣￣￣￣￣￣￣￣|')
@@ -94,26 +92,14 @@ if __name__ == '__main__':
     ranks = sliding_windows_treatment_image_time_series_parallel(image, windows_mask, function_to_compute, function_args, multi=ENABLE_MULTI, number_of_threads_rows=number_of_threads_rows, number_of_threads_columns=number_of_threads_columns)
     print("Elpased time: %d s" %(time.time()-t_beginning))
 
-    # Test LRCG with EDC
-    statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test]
-    statistic_names = ['$\hat{\Lambda}_{\mathrm{G}}$', '$\hat{\Lambda}_{\mathrm{LRG, R=EDC}}$']
-    args_list = [('log'), ('EDC', False, 'log')]
-
+    # Test with EDC
+    statistic_list = [LR_CM_equality_test, LR_CM_equality_test]
+    statistic_names = ['$\hat{\Lambda}_{\mathrm{LRG, R=1}}$', '$\hat{\Lambda}_{\mathrm{LRG, R=EDC}}$']
+    args_list = [(1, False, 'log'), ('EDC_thresholded_4', False, 'log')]
+    function_args = [statistic_list, args_list]
     if not (len(statistic_list)==len(statistic_names)==len(args_list)):
         print('ERROR')
         sys.exit(1)
-
-    number_of_statistics = len(statistic_list)
-    function_args = [statistic_list, args_list]
-
-    rank_values = np.unique(ranks)
-    number_of_points = 1000
-    for rank in rank_values:
-        if (ranks==rank).sum() < 10*number_of_points:
-            print('rank:', rank)
-            print('(ranks==rank).sum():', (ranks==rank).sum())
-            ranks[ranks==rank] = 3
-    rank_values = np.unique(ranks)
 
     print( '|￣￣￣￣￣￣￣￣|')
     print( '|   COMPUTING   |') 
@@ -127,15 +113,18 @@ if __name__ == '__main__':
     print("Elpased time: %d s" %(time.time()-t_beginning))
 
     # Computing ROC curves
-    pfa_array = np.zeros((number_of_points, len(function_args[0])))
-    pd_array = np.zeros((number_of_points, len(function_args[0])))
+    rank_values = np.unique(ranks)
+    nb_thresholds = 1000
+    nb_points = nb_thresholds//10
+    pfa_array = np.zeros((nb_points, len(function_args[0])))
+    pd_array = np.zeros((nb_points, len(function_args[0])))
 
-    # Compute ROC curve for CG
+    # Compute ROC curve for non adaptative model
     # Sorting values of statistic
     λ_vec = np.sort(vec(results[:,:,0]), axis=0)
     λ_vec = λ_vec[np.logical_not(np.isinf(λ_vec))]
-    # Selectionning number_of_points values from beginning to end
-    indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=number_of_points)) # logspace
+    # Selectionning nb_points values from beginning to end
+    indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=nb_points)) # logspace
     λ_vec = np.flip(λ_vec, axis=0)
     λ_vec = λ_vec[indices_λ.astype(int)]
     # Thresholding and summing for each value
@@ -145,10 +134,10 @@ if __name__ == '__main__':
         pd_array[i_λ, 0] = good_detection.sum() / (ground_truth==1).sum()
         pfa_array[i_λ, 0] = false_alarms.sum() / (ground_truth==0).sum()
 
-    pfa_array_ranks = np.zeros((len(ranks), number_of_points))
-    pd_array_ranks = np.zeros((len(ranks), number_of_points))
+    pfa_array_ranks = np.zeros((len(ranks), nb_thresholds))
+    pd_array_ranks = np.zeros((len(ranks), nb_thresholds))
 
-    # Compute ROC curve for LRCG
+    # Compute ROC curve for low rank model
     for rank in rank_values:
         mask = (ranks == rank)[:,:,0]
         results_rank = results[:,:,1][mask]
@@ -157,8 +146,8 @@ if __name__ == '__main__':
         # Sorting values of statistic
         λ_vec = np.sort(vec(results_rank), axis=0)
         λ_vec = λ_vec[np.logical_not(np.isinf(λ_vec))]
-        # Selectionning number_of_points values from beginning to end
-        indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=number_of_points)) # logspace
+        # Selectionning nb_thresholds values from beginning to end
+        indices_λ = np.floor(np.linspace(0, len(λ_vec)-1, num=nb_thresholds)) # logspace
         λ_vec = np.flip(λ_vec, axis=0)
         λ_vec = λ_vec[indices_λ.astype(int)]
         # Thresholding and summing for each value
@@ -168,8 +157,7 @@ if __name__ == '__main__':
             pd_array_ranks[rank, i_λ] = good_detection.sum() / (ground_truth_rank==1).sum()
             pfa_array_ranks[rank, i_λ] = false_alarms.sum() / (ground_truth_rank==0).sum()
 
-    number_of_points = number_of_points//10
-    pfa_target = np.linspace(1/number_of_points, 1, num=number_of_points)
+    pfa_target = np.linspace(1/nb_points, 1, num=nb_points)
     for i, pfa in enumerate(pfa_target):
         pd = 0
         for rank in rank_values:
@@ -183,6 +171,8 @@ if __name__ == '__main__':
                 print('pfa:', pfa)
                 print('pfa_array_ranks[rank, j]:', pfa_array_ranks[rank, j])
                 print()
+                if not DEBUG:
+                    sys.exit(1)
             nb_points_rank = (ranks == rank).sum()
             pd += nb_points_rank*pd_array_ranks[rank, j]
         pfa_array[i, 1] = pfa
