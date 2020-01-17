@@ -433,7 +433,9 @@ def tyler_estimator_covariance_low_rank(𝐗, R, σ2, tol=0.001, iter_max=20):
 
     # Recursive algorithm
     while (δ>tol) and (iteration<iter_max):
-        
+        if iteration == (iter_max-1):
+            print('tyler_estimator_covariance_low_rank: Warning iteration max reached:', iteration+1)
+
         # Computing expression of Tyler estimator (with matrix multiplication)
         τ = np.diagonal(𝐗.conj().T@np.linalg.inv(𝚺)@𝐗)
         𝐗_bis = 𝐗 / np.sqrt(τ)
@@ -475,6 +477,8 @@ def tyler_estimator_covariance_matandtext_low_rank(𝐗, R, σ2, tol, iter_max):
 
     # Recursive algorithm
     while (δ>tol) and iteration < iter_max:
+        if iteration == (iter_max-1):
+            print('tyler_estimator_covariance_matandtext_low_rank: Warning iteration max reached:', iteration+1)
 
         # Compute the textures for each pixel using all the dates available
         τ = 0
