@@ -19,6 +19,7 @@
 # limitations under the License.
 ##############################################################################
 import os, sys, time
+from datetime import datetime
 
 # The code is already multi threaded so we block OpenBLAS multi thread.
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
@@ -31,6 +32,7 @@ sys.path.insert(1, temp)
 import seaborn as sns
 import matplotlib.pyplot as plt
 sns.set_style('darkgrid')
+import tikzplotlib
 
 from LRST.generic_functions import *
 from LRST.monte_carlo_tools import *
@@ -172,7 +174,16 @@ if __name__ == '__main__':
     # Activate latex in figures (or not)
     LATEX_IN_FIGURES = True
     if LATEX_IN_FIGURES:
-      enable_latex_infigures()
+        enable_latex_infigures()
+
+    USE_TIKZPLOTLIB = True
+
+    # date = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+    # DIRECTORY_TIKZ = 'tikz_figures' + '_' + date
+    DIRECTORY_TIKZ = 'tex'
+    if USE_TIKZPLOTLIB:
+        if not os.path.exists(DIRECTORY_TIKZ):
+            os.makedirs(DIRECTORY_TIKZ)
 
     # Enable parallel processing (or not)
     ENABLE_MULTI = True
@@ -203,9 +214,9 @@ if __name__ == '__main__':
     ground_truth = ground_truth_original[int(m_r/2):-int(m_r/2), int(m_c/2):-int(m_c/2)]
 
     # Gaussian
-    # statistic_list = [covariance_equality_glrt_gaussian_statistic]
-    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$']
-    # args_list = ['log']
+    statistic_list = [covariance_equality_glrt_gaussian_statistic]
+    statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$']
+    args_list = ['log']
 
     # Low rank Gaussian
     # statistic_list = [LR_CM_equality_test]
@@ -228,9 +239,9 @@ if __name__ == '__main__':
     # args_list = [(0.01, 20, 'log'), (0.01, 20, 3, False, 'log')]
 
     # Comparaison of the 4 models
-    statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
-    statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{LRG}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
-    args_list = ['log', (3, False, 'log'), (0.01, 100, 'log'), (0.01, 100, 3, False, 'log')]
+    # statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{LRG}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
+    # args_list = ['log', (3, False, 'log'), (0.01, 100, 'log'), (0.01, 100, 3, False, 'log')]
 
     # Comparaison of 2 methods of evaluating σ2
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank, scale_and_shape_equality_robust_statistic_low_rank]
@@ -327,6 +338,8 @@ if __name__ == '__main__':
         plt.xlabel(r'Azimuth (m)')
         plt.ylabel(r'Range (m)')
         plt.colorbar()
+        if USE_TIKZPLOTLIB:
+            tikzplotlib.save(DIRECTORY_TIKZ + '/image_t' + str(t) + '.tex')
 
     # Showing ground truth
     plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
@@ -335,6 +348,8 @@ if __name__ == '__main__':
     plt.xlabel(r'Azimuth (m)')
     plt.ylabel(r'Range (m)')
     plt.colorbar()
+    if USE_TIKZPLOTLIB:
+        tikzplotlib.save(DIRECTORY_TIKZ + '/ground_truth.tex')
 
     # Showing statistics results raw
     for i_s, statistic in enumerate(statistic_names):
@@ -346,6 +361,8 @@ if __name__ == '__main__':
         plt.ylabel(r'Range (m)')
         plt.title(statistic)
         plt.colorbar()
+        if USE_TIKZPLOTLIB:
+            tikzplotlib.save(DIRECTORY_TIKZ + '/statistic' + str(i_s) + '.tex')
 
     # Showing statistics results ROC
     plt.figure(figsize=(6, 4), dpi=120, facecolor='w')
@@ -356,4 +373,8 @@ if __name__ == '__main__':
     plt.legend()
     plt.xlim([0.,1])
     plt.ylim([0,1])
-    plt.show()
+    if USE_TIKZPLOTLIB:
+        tikzplotlib.save(DIRECTORY_TIKZ + '/ROC.tex')
+    
+    if not USE_TIKZPLOTLIB:
+        plt.show()
