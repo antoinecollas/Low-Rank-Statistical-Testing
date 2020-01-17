@@ -196,7 +196,7 @@ if __name__ == '__main__':
 
     # Parameters
     n_r, n_rc, p, T = image.shape
-    windows_mask = np.ones((5,5))
+    windows_mask = np.ones((7,7))
     m_r, m_c = windows_mask.shape
     function_to_compute = compute_several_statistics
 
@@ -220,12 +220,17 @@ if __name__ == '__main__':
     # Low rank Compound Gaussian
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank]
     # statistic_names = [r'$\hat{=\Lambda}_{\mathrm{LRCG}}$']
-    # args_list = [(0.01, 20, None, False, 'log')]
+    # args_list = [(0.01, 20, 3, False, 'log')]
+
+    # Compound Gaussian vs Low rank Compound Gaussian
+    # statistic_list = [scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
+    # args_list = [(0.01, 20, 'log'), (0.01, 20, 3, False, 'log')]
 
     # Comparaison of the 4 models
-    # statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
-    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{LRG}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
-    # args_list = ['log', (1, False, 'log'), (0.01, 20, 'log'), (0.01, 20, 1, False, 'log')]
+    statistic_list = [covariance_equality_glrt_gaussian_statistic, LR_CM_equality_test, scale_and_shape_equality_robust_statistic, scale_and_shape_equality_robust_statistic_low_rank]
+    statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{LRG}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$', r'$\hat{\Lambda}_{\mathrm{LRCG}}$']
+    args_list = ['log', (3, False, 'log'), (0.01, 100, 'log'), (0.01, 100, 3, False, 'log')]
 
     # Comparaison of 2 methods of evaluating σ2
     # statistic_list = [scale_and_shape_equality_robust_statistic_low_rank, scale_and_shape_equality_robust_statistic_low_rank]
@@ -245,20 +250,20 @@ if __name__ == '__main__':
     # args_list = [(0.01, 20, rank, False, 'log') for rank in rank_list]
 
     # Simu paper
-    ranks = [1, 3]
-    statistic_list = [covariance_equality_glrt_gaussian_statistic, scale_and_shape_equality_robust_statistic]
-    statistic_list += [LR_CM_equality_test]*len(ranks)
-    statistic_list += [scale_and_shape_equality_robust_statistic_low_rank]*len(ranks)
-    statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$']
-    for rank in ranks:
-        statistic_names += [r'$\hat{\Lambda}_{\mathrm{LRG, R='+str(rank)+'}}$']
-    for rank in ranks:
-        statistic_names += [r'$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$']
-    args_list = ['log', (0.01, 20, 'log')]
-    for rank in ranks:
-        args_list += [(rank, False, 'log')]
-    for rank in ranks:
-        args_list += [(0.01, 20, rank, False, 'log')]
+    # ranks = [1, 3]
+    # statistic_list = [covariance_equality_glrt_gaussian_statistic, scale_and_shape_equality_robust_statistic]
+    # statistic_list += [LR_CM_equality_test]*len(ranks)
+    # statistic_list += [scale_and_shape_equality_robust_statistic_low_rank]*len(ranks)
+    # statistic_names = [r'$\hat{\Lambda}_{\mathrm{G}}$', r'$\hat{\Lambda}_{\mathrm{CG}}$']
+    # for rank in ranks:
+    #     statistic_names += [r'$\hat{\Lambda}_{\mathrm{LRG, R='+str(rank)+'}}$']
+    # for rank in ranks:
+    #     statistic_names += [r'$\hat{\Lambda}_{\mathrm{LRCG, R='+str(rank)+'}}$']
+    # args_list = ['log', (0.01, 20, 'log')]
+    # for rank in ranks:
+    #     args_list += [(rank, False, 'log')]
+    # for rank in ranks:
+    #     args_list += [(0.01, 20, rank, False, 'log')]
 
     if not (len(statistic_list)==len(statistic_names)==len(args_list)):
         print('ERROR')
