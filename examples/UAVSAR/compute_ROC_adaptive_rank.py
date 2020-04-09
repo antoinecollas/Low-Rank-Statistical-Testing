@@ -3,6 +3,8 @@
 # WARNING: will download about 28 Go of data
 # Authored by Ammar Mian, 10/01/2019
 # e-mail: ammar.mian@centralesupelec.fr
+# Modified by Antoine Collas, 10/2019
+# e-mail: antoine.collas@centralesupelec.fr
 ##############################################################################
 # Copyright 2018 @CentraleSupelec
 #

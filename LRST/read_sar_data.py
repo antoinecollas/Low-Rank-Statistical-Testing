@@ -2,6 +2,8 @@
 # Some data reading functions
 # Authored by Ammar Mian, 09/11/2018
 # e-mail: ammar.mian@centralesupelec.fr
+# Modified by Antoine Collas, 10/2019
+# e-mail: antoine.collas@centralesupelec.fr
 ##############################################################################
 # Copyright 2018 @CentraleSupelec
 #

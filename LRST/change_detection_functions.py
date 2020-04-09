@@ -2,6 +2,8 @@
 # Functions used to detect a change in the parameters of a SIRV distribution
 # Authored by Ammar Mian, 28/09/2018
 # e-mail: ammar.mian@centralesupelec.fr
+# Modified by Antoine Collas, 10/2019
+# e-mail: antoine.collas@centralesupelec.fr
 ##############################################################################
 # Copyright 2018 @CentraleSupelec
 #

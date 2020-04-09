@@ -20,21 +20,7 @@ pip install -r requirements.txt
 python compute_ROC_UAVSAR_dataset.py
 ```
 
-## Files' organisation
-
-
-
-## Requirements for Python
-	The code provided was developped and tested using Python 3.7. The following packages must be installed 
-	in order to run everything smoothly:
-	- Scipy/numpy
-	- matplotlib
-	- seaborn
-	- wget (if you do not have the UAVSAR data yet)
-	- tqdm
-
-The code use parallel processing which can be disabled by putting the boolean ENABLE_MULTI to False in each file.
-The figures can be plotted using Latex formatting by putting the boolean LATEX_IN_FIGURES to True in each file (must have a latex distribution installed).
+## Dataset
 
 Dataset available at https://uavsar.jpl.nasa.gov/.
 
@@ -42,11 +28,14 @@ Dataset available at https://uavsar.jpl.nasa.gov/.
 **Author:** Ammar Mian, Ph.d student at SONDRA, CentraleSupélec
  - **E-mail:** ammar.mian@centralesupelec.fr
  - **Web:** https://ammarmian.github.io/
- 
+**Modified by:** Antoine Collas, Ph.d student at SONDRA, CentraleSupélec
+ - **E-mail:** antoine.collas@centralesupelec.fr
+
  Acknowledgements to:
  - [**Arnaud Breloy**](https://www.researchgate.net/profile/Arnaud_Breloy), LEME, Université Paris Nanterre
  - [**Guillaume Ginolhac**](https://www.listic.univ-smb.fr/presentation/membres/enseignants-chercheurs/guillaume-ginolhac/), LISTIC, Université Savoie Mont-Blanc
  - [**Jean-Philippe Ovarlez**](http://www.jeanphilippeovarlez.com/), DEMR, ONERA , Université Paris-Saclay  & SONDRA, CentraleSupélec
+ - [**Chengfang Ren**](https://sites.google.com/view/chengfangren/), SONDRA, CentraleSupélec
 
  
 ## Copyright
