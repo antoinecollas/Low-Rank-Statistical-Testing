@@ -28,6 +28,7 @@ Dataset available at https://uavsar.jpl.nasa.gov/.
 **Author:** Ammar Mian, Ph.d student at SONDRA, CentraleSupélec
  - **E-mail:** ammar.mian@centralesupelec.fr
  - **Web:** https://ammarmian.github.io/
+
 **Modified by:** Antoine Collas, Ph.d student at SONDRA, CentraleSupélec
  - **E-mail:** antoine.collas@centralesupelec.fr
 
