@@ -1,6 +1,5 @@
 # Robust Low-Rank Statistical testing
 
-Clean version under work for robust Low-Rank statistical learning.
 
 ## Quick start (linux/macOS)
 
