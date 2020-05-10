@@ -42,7 +42,7 @@ class uavsar_slc_stack_1x1():
             dates.append(identifier.split('_')[4])
         return list(identifier_list[np.argsort(dates)])
 
-    def read_data(self, time_series=True, polarisation=['HH', 'HV', 'VV'], segment=1, crop_indexes=None):
+    def read_data(self, time_series=True, polarisation=['HH', 'HV', 'VV'], segment=1, crop_indexes=None, verbose=True):
         """ A method to read UAVSAR SLC 1x1 data stack
             Inputs:
                 * polarisation = a list of polarisations to read
@@ -91,7 +91,8 @@ class uavsar_slc_stack_1x1():
                     file_name = entry_time.replace('POL', pol).replace('SEGMENT', str(segment))
                     shape = (int(self.meta_data['_'.join(file_name.split('_')[:-1])]['slc_1_1x1 Rows']),
                              int(self.meta_data['_'.join(file_name.split('_')[:-1])]['slc_1_1x1 Columns']))   
-                    print("Reading %s" % (self.path+file_name))
+                    if verbose:
+                        print("Reading %s" % (self.path+file_name))
                     with open(self.path + file_name + '_1x1.slc', 'rb') as f:
                         f.seek((crop_indexes[0]*shape[1]+crop_indexes[2])*8, os.SEEK_SET)
                         for row in range(crop_indexes[1]-crop_indexes[0]):
