@@ -134,7 +134,6 @@ if __name__ == '__main__':
     plt.title('Ground Truth')
     plt.xlabel(r'Azimuth (m)')
     plt.ylabel(r'Range (m)')
-    plt.colorbar()
     if USE_TIKZPLOTLIB:
         tikzplotlib.save(DIRECTORY_TIKZ + '/ground_truth.tex')
 
@@ -145,7 +144,6 @@ if __name__ == '__main__':
         plt.title(statistic)
         plt.xlabel(r'Azimuth (m)')
         plt.ylabel(r'Range (m)')
-        plt.colorbar()
         if USE_TIKZPLOTLIB:
             tikzplotlib.save(DIRECTORY_TIKZ + '/statistic' + str(i_s) + '.tex')
 
