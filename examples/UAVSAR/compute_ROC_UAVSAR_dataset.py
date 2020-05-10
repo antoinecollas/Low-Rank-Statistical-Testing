@@ -88,7 +88,7 @@ def download_uavsar_cd_dataset(path='./data/'):
             print("File %s not found, downloading it" % file_url.split('/')[-1])
             wget.download(url=file_url, out=path+file_url.split('/')[-1])
 
-def load_UAVSAR(path, debug, full_time_series, scene_number=1):
+def load_UAVSAR(path, debug, full_time_series, scene_number=1, verbose=True):
     """ Function which loads UAVSAR time series with its ground truth. It also applies a wavelet decomposition.
 
     Inputs:
@@ -111,23 +111,25 @@ def load_UAVSAR(path, debug, full_time_series, scene_number=1):
 
     # Downloading data if needed
     download_uavsar_cd_dataset(path=path)
-    
-    # Reading data using the class
-    print( '|￣￣￣￣￣￣￣￣|')
-    print( '|   READING     |') 
-    print( '|   dataset     |')
-    print( '|               |' )  
-    print( '| ＿＿＿_＿＿＿＿|') 
-    print( ' (\__/) ||') 
-    print( ' (•ㅅ•) || ')
-    print( ' / 　 づ')
+   
+    if verbose:
+        # Reading data using the class
+        print( '|￣￣￣￣￣￣￣￣|')
+        print( '|   READING     |') 
+        print( '|   dataset     |')
+        print( '|               |' )  
+        print( '| ＿＿＿_＿＿＿＿|') 
+        print( ' (\__/) ||') 
+        print( ' (•ㅅ•) || ')
+        print( ' / 　 づ')
     data_class = uavsar_slc_stack_1x1(path)
-    data_class.read_data(time_series=full_time_series, polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=crop_indexes)
+    data_class.read_data(time_series=full_time_series, polarisation=['HH', 'HV', 'VV'], segment=4, crop_indexes=crop_indexes, verbose=verbose)
     if debug:
         n_r, n_rc, _, _ = data_class.data.shape
         new_size_image = 200
         data_class.data = data_class.data[(n_r//2)-(new_size_image//2):(n_r//2)+(new_size_image//2), (n_rc//2)-(new_size_image//2):(n_rc//2)+(new_size_image//2), :, :]
-    print('Done')
+    if verbose:
+        print('Done')
 
     # Spatial vectors
     center_frequency = 1.26e+9 # GHz, for L Band
@@ -148,14 +150,15 @@ def load_UAVSAR(path, debug, full_time_series, scene_number=1):
     d_2 = 10
 
     # Wavelet decomposition of the time series
-    print( '|￣￣￣￣￣￣￣￣|')
-    print( '|   Wavelet     |') 
-    print( '| decomposition |')
-    print( '|               |' )  
-    print( '| ＿＿＿_＿＿＿＿|') 
-    print( ' (\__/) ||') 
-    print( ' (•ㅅ•) || ')
-    print( ' / 　 づ')
+    if verbose:
+        print( '|￣￣￣￣￣￣￣￣|')
+        print( '|   Wavelet     |') 
+        print( '| decomposition |')
+        print( '|               |' )  
+        print( '| ＿＿＿_＿＿＿＿|') 
+        print( ' (\__/) ||') 
+        print( ' (•ㅅ•) || ')
+        print( ' / 　 づ')
     image = np.zeros((number_pixels_azimuth, number_pixels_range, p*R*L, T), dtype=complex)
     for t in range(T):
         for i_p in range(p):
@@ -163,7 +166,8 @@ def load_UAVSAR(path, debug, full_time_series, scene_number=1):
                                     R, L, d_1, d_2)
             image[:,:,i_p*R*L:(i_p+1)*R*L, t] = image_temp
     image_temp = None
-    print('Done')
+    if verbose:
+        print('Done')
 
     path_ground_truth = './data/ground_truth_uavsar_scene'+str(scene_number)+'.npy'
     ground_truth_original = np.load(path_ground_truth)
