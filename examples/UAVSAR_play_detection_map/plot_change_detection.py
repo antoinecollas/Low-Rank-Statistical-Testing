@@ -53,14 +53,6 @@ if __name__ == '__main__':
     if LATEX_IN_FIGURES:
         enable_latex_infigures()
 
-    USE_TIKZPLOTLIB = False
-
-    # date = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
-    # DIRECTORY_TIKZ = 'tikz_figures' + '_' + date
-    DIRECTORY_TIKZ = 'tex'
-    if USE_TIKZPLOTLIB:
-        if not os.path.exists(DIRECTORY_TIKZ):
-            os.makedirs(DIRECTORY_TIKZ)
 
     # DEBUG mode for fast debugging (use a small patch)
     DEBUG = False
@@ -70,6 +62,12 @@ if __name__ == '__main__':
     if not(PFA>=0 and PFA<=1):
         print('ERROR in selected pfa')
         sys.exit(1)
+    
+    USE_TIKZPLOTLIB = True
+    DIRECTORY_TIKZ = 'tikz_figures_scene_' + str(SCENE_NUMBER)
+    if USE_TIKZPLOTLIB:
+        if not os.path.exists(DIRECTORY_TIKZ):
+            os.makedirs(DIRECTORY_TIKZ)
 
     # Statistics of detection maps
     STATISTIC_NAMES = ['Gaussian', 'Low rank Gaussian', 'Compound', 'Low rank compound']
@@ -145,7 +143,7 @@ if __name__ == '__main__':
         plt.xlabel(r'Azimuth (m)')
         plt.ylabel(r'Range (m)')
         if USE_TIKZPLOTLIB:
-            tikzplotlib.save(DIRECTORY_TIKZ + '/statistic' + str(i_s) + '.tex')
+            tikzplotlib.save(DIRECTORY_TIKZ + '/' + statistic + '.tex')
 
     
     if not USE_TIKZPLOTLIB:
