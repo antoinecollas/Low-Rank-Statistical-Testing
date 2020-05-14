@@ -22,7 +22,6 @@
 import sys
 import numpy as np
 import scipy as sp
-from sklearn.decomposition._pca import _assess_dimension_
 
 import warnings
 
@@ -180,6 +179,8 @@ def Minka_criterion(s, n):
     Outputs:
     ---------
         * the criterion """
+
+    from sklearn.decomposition._pca import _assess_dimension_
     p = len(s)
     criterion = np.empty(p)
     for rank in range(p):
